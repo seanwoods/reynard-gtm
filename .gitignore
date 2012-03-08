@@ -1,3 +1,4 @@
 *.o
 bin/_dbserver
 globals/*
+routines/queries/*
