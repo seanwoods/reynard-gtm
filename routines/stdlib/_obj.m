@@ -133,6 +133,15 @@ deindex(class,id) ; Remove indexes for object.
  . Q
  Q
  ;
+rebuildIndexes(class) ; Rebuild an object's indexes.
+ N glvn,id,idxStruct
+ S glvn=$$glvn(class,"o"),idxStruct=$$glvn(class,"x")
+ K @idxStruct
+ S id="" F  S id=$O(@glvn@(id)) Q:id=""  D
+ . D index(class,id)
+ . Q
+ Q
+ ;
 get(class,id,data) ; Copy an object into `data` array.
  N field,glvn,offset,schema
  S glvn=$$glvn(class,"o"),schema=$$glvn(class,"d")
@@ -146,6 +155,7 @@ get(class,id,data) ; Copy an object into `data` array.
 getField(class,id,field) ; Get an object field's value.
  S glvn=$$glvn(class,"o"),schema=$$glvn(class,"d"),schemaX=$$glvn(class,"dx")
  ;
+ Q:$G(@glvn@(id))="" ""
  Q $P(@glvn@(id),$C(31),@schemaX@(field))
  ;
 getRaw(class,id) ; Get the object's raw representation.
