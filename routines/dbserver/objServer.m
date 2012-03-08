@@ -1,0 +1,73 @@
+objServer ; handler for external program calls to object server.
+ Q
+ ;
+multiPartCharSeq() Q $C(2,6,3,7)
+ ;
+alloc() ; allocate a new message.
+ Q $I(^objServerMsg)
+ ;
+setrec(msg,segment,record,data) ;
+ S ^objServerMsg(msg,segment,record)=data
+ Q 1
+ ;
+handleMsg(msgID) ; handle the given message
+ N code,done,len,seg,%zzzt
+ K out
+ ;
+ S %zzzt="TRO:$TL>0  S err=$I(^sErr) ZSHOW ""*"":^sErr(err) "
+ S %zzzt=%zzzt_"S ^sErr(err)=$H_"" ""_$J_"" ""_$EC "
+ S $ZT=%zzzt_"S $EC="",U999-Error info available in #""_err_"","""
+ K %zzzt
+ ;
+ S out="OK"
+ ;
+ TS
+ S seg=0,done=0 F  Q:done  D
+ . S len=^objServerMsg(msgID,seg,1)
+ . S code=$G(^sObjDest(^objServerMsg(msgID,seg,0)))
+ . S code=code_"(msgID,.seg,.out)"
+ . S:code="" out="NOK"
+ . I code'="" D @code
+ . ;
+ . ; Reset seg and len to process next logical message.
+ . ;
+ . I $D(^objServerMsg(msgID,seg+len+1))=0 S done=1 Q
+ . S seg=seg+len+1,len=^objServerMsg(msgID,seg,1)
+ . Q
+ ;
+ TC
+ ;
+ Q:$$hasChildren^%var($NA(out)) $$multiPartCharSeq()_$NA(out)
+ Q out
+ ;
+next(vn,sub) ; retrieve next value from database, incrementing `sub`.
+ ;
+ ; useful for one-dimensional arrays, e.g. sending multi-part output.
+ ;
+ N val
+ S:sub="" sub=$O(@vn@(sub)) ; initial increment
+ S val=@vn@(sub)
+ S sub=$o(@vn@(sub))
+ Q val
+ ;
+initObjDest ; initialize verb destination table.
+ K ^sObjDest
+ S ^sObjDest("SETOBJ")="set^objNet"
+ S ^sObjDest("GETOBJ")="get^objNet"
+ S ^sObjDest("DELOBJ")="del^objNet"
+ S ^sObjDest("QUERY")="query^objNet"
+ S ^sObjDest("VIEW")="view^objNet"
+ S ^sObjDest("LISTOBJ")="list^objNet"
+ S ^sObjDest("LISTOBJS")="listObjects^objNet"
+ S ^sObjDest("LISTVIEWS")="listViews^objNet"
+ S ^sObjDest("ENHSCHEMA")="enhancedSchema^objNet"
+ S ^sObjDest("POINTERS")="pointers^objNet"
+ Q
+ ;
+refresh ; zlink current routines
+ N rtn
+ S rtn="" F  S rtn=$V("RTNNEXT",rtn) Q:rtn=""  D
+ . I rtn'["$DMOD",rtn'["$CI",rtn'=$T(+0) ZL $TR(rtn,"%","_")
+ . Q
+ Q
+ ;

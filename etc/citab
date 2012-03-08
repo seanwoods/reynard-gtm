@@ -1,0 +1,8 @@
+exec:     gtm_char_t*   exec^objServer(I:gtm_char_t*, I:gtm_char_t*)
+setrec:   gtm_char_t*   setrec^objServer(I:gtm_int_t, I:gtm_int_t, I:gtm_int_t, I:gtm_char_t*)
+alloc:    gtm_char_t*   alloc^objServer()
+handleMsg: gtm_char_t*  handleMsg^objServer(I:gtm_int_t)
+next:      gtm_char_t*  next^objServer(I:gtm_char_t*, IO:gtm_char_t*)
+esave:     gtm_char_t*  ci^%err()
+err:       gtm_char_t*  err^%err()
+refresh:   void         refresh^objServer()

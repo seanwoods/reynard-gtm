@@ -1,0 +1,226 @@
+#!/usr/bin/env bash
+
+#if [ "$0" -ne "-bash" ]; then
+#    echo "Error: Use source on this script, don't execute it directly."
+#    return
+#    # TODO what about other shells
+#fi
+
+if [ -z `which icu-config` ]; then
+    echo "Error: icu-config not found!"
+    return
+else
+    icu_version=`icu-config --version`
+fi
+
+if [ -z "$gtm_dist" ]; then
+    echo 'Error: $gtm_dist variable not set.'
+    return
+fi
+
+# TODO May need to remvoe test for writable when shared libraries are used.
+
+if [ ! -w "$gtm_dist" ]; then
+    echo "Error: $gtm_dist is not writable by this user.  Programs won't compile."
+    return
+fi
+
+if [ -z "$gtm_routines" ]; then
+    export gtmroutines=$gtm_dist
+fi
+
+# TODO May need to remvoe test for writable when shared libraries are used.
+
+for dir in $gtm_routines
+do
+    if [ ! -w "$dir"]; then
+        echo "Error: $dir is not writable by this user.  Programs won't compile."
+    fi
+done
+
+for dir in "routines" "globals" "log" "tmp"
+do
+    if [ ! -d "$PWD/$dir" ]; then
+        echo "Error: $PWD/$dir does not exist.  Please create it."
+        return
+    fi
+done
+
+gtmdeactivate () {
+    if [ -n "$_old_gtmver" ]; then
+        gtmver=$_old_gtmver
+        export gtmver
+    else
+        unset gtmver
+    fi
+
+    if [ -n "$_old_gtm_icu_version" ]; then
+        gtm_icu_version=$_old_gtm_icu_version
+        export gtm_icu_version
+    else
+        unset gtm_icu_version
+    fi
+
+    if [ -n "$_old_gtm_dist" ]; then
+        gtm_dist=$_old_gtm_dist
+        export gtm_dist
+    else
+        unset gtm_dist
+    fi
+
+    if [ -n "$_old_gtm_retention" ]; then
+        gtm_retention=$_old_gtm_retention
+        export gtm_retention
+    else
+        unset gtm_retention
+    fi
+
+    if [ -n "$_old_mumps_root" ]; then
+        mumps_root=$_old_mumps_root
+        export mumps_root
+    else
+        unset mumps_root
+    fi
+
+    if [ -n "$_old_PATH" ]; then
+        PATH=$_old_PATH
+        export PATH
+    else
+        unset PATH
+    fi
+
+    if [ -n "$_old_gtm_tmp" ]; then
+        gtm_tmp=$_old_gtm_tmp
+        export gtm_tmp
+    else
+        unset gtm_tmp
+    fi
+
+    if [ -n "$_old_gtm_log" ]; then
+        gtm_log=$_old_gtm_log
+        export gtm_log
+    else
+        unset gtm_log
+    fi
+
+    if [ -n "$_old_gtmgbldir" ]; then
+        gtmgbldir=$_old_gtmgbldir
+        export gtmgbldir
+    else
+        unset gtmgbldir
+    fi
+
+    if [ -n "$_old_gtmroutines" ]; then
+        gtmroutines=$_old_gtmroutines
+        export gtmroutines
+    else
+        unset gtmroutines
+    fi
+
+    if [ -n "$_old_GTMCI" ]; then
+        GTMCI=$_old_GTMCI
+        export GTMCI
+    else
+        unset GTMCI
+    fi
+
+    if [ -n "$_old_gtm_chset" ]; then
+        gtm_chset=$_old_gtm_chset
+        export gtm_chset
+    else
+        unset gtm_chset
+    fi
+
+    if [ -n "$_old_LC_CTYPE" ]; then
+        LC_CTYPE=$_old_LC_CTYPE
+        export LC_CTYPE
+    else
+        unset LC_CTYPE
+    fi
+    
+    if [ -n "$_old_LC_ALL" ]; then
+        LC_ALL=$_old_LC_ALL
+        export LC_ALL
+    else
+        unset LC_ALL
+    fi
+
+}
+
+if [ -n "$gtmver" ]; then
+    _old_gtmver=$gtmver
+fi
+
+if [ -n "$gtm_icu_version" ]; then
+    _old_gtm_icu_version=$gtm_icu_version
+fi
+
+if [ -n "$gtm_dist" ]; then
+    _old_gtm_dist=$gtm_dist
+fi
+
+if [ -n "$gtm_retention" ]; then
+    _old_gtm_retention=$gtm_retention
+fi
+
+if [ -n "$mumps_root" ]; then
+    _old_mumps_root=$mumps_root
+fi
+
+if [ -n "$PATH" ]; then
+    _old_PATH=$PATH
+fi
+
+if [ -n "$gtm_tmp" ]; then
+    _old_gtm_tmp=$gtm_tmp
+fi
+
+if [ -n "$gtm_log" ]; then
+    _old_gtm_log=$gtm_log
+fi
+
+if [ -n "$gtmgbldir" ]; then
+    _old_gtmgbldir=$gtmgbldir
+fi
+
+if [ -n "$gtmroutines" ]; then
+    _old_gtmroutines=$gtmroutines
+fi
+
+if [ -n "$GTMCI" ]; then
+    _old_GTMCI=$GTMCI
+fi
+
+if [ -n "$gtm_chset" ]; then
+    _old_gtm_chset=$gtm_chset
+fi
+
+if [ -n "$LC_CTYPE" ]; then
+    _old_LC_CTYPE=$LC_CTYPE
+fi
+
+if [ -n "$LC_ALL" ]; then
+    _old_LC_ALL=$LC_ALL
+fi
+
+# Set up Unicode handling, if applicable.
+
+if [ `basename $gtm_dist` = 'utf8' ]; then
+    export gtm_icu_version=$(echo `icu-config --version` | cut -d '.' -f 1,2)
+    export gtm_chset=UTF-8
+    export LC_CTYPE=en_US.utf8
+    export LC_ALL=en_US.utf8
+fi
+
+export gtmver=`$gtm_dist/mumps -r %XCMD 'W $P($ZV," ",2)_"_"_$P($ZV," ",4)'`
+export gtm_retention=42
+export mumps_root=$PWD
+export PATH="$PWD/bin:$PATH"
+export gtm_tmp=$mumps_root/tmp
+export gtm_log=$mumps_root/log
+export gtmgbldir=$mumps_root/globals/gtm.gld
+export gtmroutines="$(find $mumps_root/routines -type d | grep -v '/\.' | xargs -I {} readlink -f {} | tr '\n' ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//') $gtm_dist"
+export GTMCI=$mumps_root/etc/citab
+alias mumps='$gtm_dist/mumps'
+alias mupip='$gtm_dist/mupip'
+alias gtm='$gtm_dist/mumps -direct'
