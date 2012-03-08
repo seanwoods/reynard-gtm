@@ -39,8 +39,9 @@ void save_input_mode(void) {
 /* Performance Measuring */
 
 long int perf_diff_time(struct timeval t1, struct timeval t2) {
-    return   (t2.tv_sec + (t1.tv_usec / 1000000))
-           - (t1.tv_sec + (t1.tv_usec / 1000000));
+
+    return   (t2.tv_sec + ( (double) t2.tv_usec / 1000000))
+           - (t1.tv_sec + ( (double) t1.tv_usec / 1000000));
 }
 
 /* Call-In Wrappers */
@@ -253,7 +254,7 @@ void dbserver_loop(char *bind_to) {
     unsigned int msg_id;
 
     struct timeval perf_time_1, perf_time_2, perf_time_3;
-    long int perf_interval_1, perf_interval_2;
+    //long int perf_interval_1, perf_interval_2;
     
     gtm_initialize(&gtm_context);
     void *zmq_context = zmq_init(1);
@@ -325,11 +326,10 @@ void dbserver_loop(char *bind_to) {
 
         gettimeofday(&perf_time_3, NULL);
         
-        perf_interval_1 = perf_diff_time(perf_time_1, perf_time_2);
-        perf_interval_2 = perf_diff_time(perf_time_3, perf_time_3);
+        // perf_interval_1 = perf_diff_time(perf_time_1, perf_time_2);
+        // perf_interval_2 = perf_diff_time(perf_time_3, perf_time_3);
 
-        //printf("Performance, interval 1: %lis\n", perf_interval_1);
-        //printf("Performance, interval 2: %lis\n", perf_interval_2);
+        // printf("P1: %10li P2%10li:\n", perf_interval_1, perf_interval_2);
 
     }
 
