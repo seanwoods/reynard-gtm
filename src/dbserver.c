@@ -264,8 +264,6 @@ void dbserver_loop(char *bind_to) {
     while (quit != SHOULD_QUIT) {
         zmq_msg_t message;
         zmq_msg_init(&message);
-        
-        gtm_refresh(&gtm_context);
 
         if(zmq_recv (responder, &message, 0)) {
             if (errno == EINTR) {
@@ -275,6 +273,8 @@ void dbserver_loop(char *bind_to) {
             printf("Failure trying to receive 0MQ message: %s\n",
                    zmq_strerror(errno));
         }
+        
+        gtm_refresh(&gtm_context);
         
         gettimeofday(&perf_time_1, NULL);
 
