@@ -147,17 +147,6 @@ int gtm_next(context_t *context, char *vn, char *sub) {
     return 1;
 }
 
-int gtm_refresh(context_t *context) {
-    context->status = gtm_ci("refresh", context->out);
-
-    if (context->status != 0) {
-        handle_error(context);
-        return 0;
-    }
-
-    return 1;
-}
-
 int gtm_handle_message(context_t *context, int msg_id) {
     context->status = gtm_ci("handleMsg", context->out, msg_id);
 
@@ -273,8 +262,6 @@ void dbserver_loop(char *bind_to) {
             printf("Failure trying to receive 0MQ message: %s\n",
                    zmq_strerror(errno));
         }
-        
-        gtm_refresh(&gtm_context);
         
         gettimeofday(&perf_time_1, NULL);
 

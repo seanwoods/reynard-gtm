@@ -14,10 +14,14 @@ handleMsg(msgID) ; handle the given message
  N code,done,len,seg,%zzzt
  K out
  ;
+ ; TODO - this error handling is really kludgy.  there must be a better way
+ ;
  S %zzzt="TRO:$TL>0  S err=$I(^sErr) ZSHOW ""*"":^sErr(err) "
  S %zzzt=%zzzt_"S ^sErr(err)=$H_"" ""_$J_"" ""_$EC "
  S $ZT=%zzzt_"S $EC="",U999-Error info available in #""_err_"","""
  K %zzzt
+ ;
+ D:$G(^sParam("Debug")) refresh
  ;
  S out="OK"
  ;
