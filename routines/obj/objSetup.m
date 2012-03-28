@@ -15,7 +15,7 @@ objSetup ; Set up supporting object structures.
  K qu
  S qu("name")="SystemPointers"
  S qu("class")="sysSchema"
- S qu("crit")="datatype = ""P"" AND object = $class"
+ S qu("crit")="datatype = ""P"" OR datatype = ""PM"" AND object = $class"
  S qu("fields")="short_name extra"
  S qu("indexBy")="short_name"
  ZL $$gen^objQuery(.qu)

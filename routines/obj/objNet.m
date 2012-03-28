@@ -96,8 +96,9 @@ listObjects(msgID,seg,out) ;
 view(msgID,seg,out) ;
  N code,i,len,rs,s,sExternal,viewName
  S viewName=^objServerMsg(msgID,seg+1,0)
- S code="do^zq"_viewName_"(.rs,.s)"
+ S code="do^zq"_viewName
  Q:$T(@code)=""
+ S code=code_"(.rs,.s)"
  D @code
  S:$G(rs)'="" out($I(out))=rs
  S sExternal=$$sortToExternal^objQuery(.s),len=$L(sExternal,$C(31))
@@ -111,6 +112,7 @@ view(msgID,seg,out) ;
 listViews(msgID,seg,out) ;
  N i,len,rs,s,sExternal
  D do^zqSystemViews(.rs,.s)
+ Q:$D(rs)=0
  S sExternal=$$sortToExternal^objQuery(.s),len=$L(sExternal,$C(31))
  F i=1:1:len S out($I(out))=rs($P(sExternal,$C(31),i))
  Q
