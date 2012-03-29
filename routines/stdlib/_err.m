@@ -59,6 +59,7 @@ display(errno) ; Display human-readable error info to $Io
  S sub="" F  S sub=$O(@errno@("S",sub)) Q:sub=""  D
  . N val
  . S val=@errno@("S",sub)
+ . I val["$ZTRAP" W "$ZTrap Error Handler:",!?5,"(see "_errno_")",! Q
  . S:val[" " val=$E(val,1,$F(val," ")-2)
  . I val["$DMOD" W val,!?5,"Direct Mode",!  Q
  . I val["$CI" W val,!?5,"Call-In",! Q

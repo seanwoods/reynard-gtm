@@ -61,6 +61,9 @@ convertOp(l,op,r,op1,op2) ;
  S op=$G(op1(op))
  S:op="" op=$G(op2(op))
  S:op="" $EC=",U96-Invalid operator"
+ I $E(l,1)="$" S l=$E(l,2,$L(l))
+ I $E(r,1)="$" S r=$E(r,2,$L(r))
+ S l=$$cvtId(l),r=$$cvtId(r)
  Q:$E(op,1)="`" r_$E(op,2,$L(op))_l
  Q:$E(op,1)="$" op_"("_l_","_r_")"
  Q l_op_r
@@ -101,7 +104,10 @@ mkCrit(query,ivar,glvn,schemaX,names) ;
  . I expect="op1",'$$inArray(.part,.op1) S $EC=",U98-Op1 Expected," Q
  . I expect="op2",'$$inArray(.part,.op2) S $EC=",U97-Op2 Expected," Q
  . I " t1 t2 "[(" "_expect_" "),$$isIdent(part) S names("C",part)=1
- . I expect="t1" S buf=buf_" "_part,expect="op1" Q
+ . I expect="t1"  D  Q
+ . . I $E(part,1)="$" S part=$E(part,2,$L(part)),names("V",part)=1
+ . . S buf=buf_" "_part,expect="op1"
+ . . Q
  . I expect="t2" D  Q
  . . I $E(part,1)="$" S part=$E(part,2,$L(part)),names("V",part)=1
  . . S buf=buf_" "_part,expect="op2"
@@ -130,8 +136,13 @@ fref(schemaX,fname) ;
 fpref(glvn,fref) ;
  Q "$P("_glvn_"(%i1),$C(31),"_fref_")" 
  ;
+routineNm(name) ;
+ Q:name="" ""
+ Q "zq"_name
+ ;
 gen(query) ;
- N codeCrit,dir,file,glvn,io,len,lev,name,names,routineNm,schemaX,sortNum,var
+ N codeCrit,dir,file,glvn,i,io,len,lev,name,names,routineNm,schemaX,sortNum,var
+ Q:$G(query("name"))="" ""
  S dir=$G(^sParam("QueryDir"),"")
  S:dir="" $EC=",U95-Query directory not specified.,"
  ; TODO - check if directory is writable
@@ -141,7 +152,7 @@ gen(query) ;
  ;
  S glvn=$$glvn^%obj(query("class"),"o"),schemaX=$$glvn^%obj(query("class"),"dx")
  ;
- S routineNm="zq"_query("name")
+ S routineNm=$$routineNm(query("name"))
  S file=dir_"/"_routineNm_".m"
  S io=$Io O file:NEWVERSION U file
  ; Analyze various names we need so that we can cache fields.
@@ -156,15 +167,17 @@ gen(query) ;
  ; Generate function signature.
  W "do(%rs,%sort"
  S var="" F  S var=$O(names("V",var)) Q:var=""  D
- . W ","_var
+ . W ","_$$cvtId(var)
  . Q
  W ") ; ",!
  ;
  W " N %i1,%ok",!
  ;
  D:$G(query("emitFields"))
- . W " S rs=""id""_$C(31)_"
- . W $$repr^%str($TR(query("fields")," ",$C(31))),!
+ . W " S rs=""id""",!
+ . F i=1:1:$L(query("fields")," ") D
+ . . W " S rs=rs_$C(31)_"_$$repr^%str($P(query("fields")," ",i)),!
+ . . Q
  . Q
  ;
  W $$mkLoop($NA(%i1),query("class")),! S lev=lev+1

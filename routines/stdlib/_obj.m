@@ -205,6 +205,9 @@ list(list) ;
  . Q
  Q
  ;
+next(class,id) ;
+ Q $O(@$$glvn(class,"o")@(id))
+ ;
 nuke(class,noconfirm) ; Wipe out all data for a class.
  N glvn,i,sure
  S sure=1

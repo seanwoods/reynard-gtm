@@ -83,7 +83,7 @@ enhancedSchema(msgID,seg,out) ;
  ;
 listObjects(msgID,seg,out) ;
  ; TODO - replace with some kind of object registry
- N class,oname
+ N class,oname,onames
  S class="^o" F  S class=$O(@class) Q:$E(class,1,2)'="^o"  D
  . Q:'$$isUpper^%str($E(class,3))
  . ; TODO - this oname stuff is kinda bad
@@ -94,11 +94,25 @@ listObjects(msgID,seg,out) ;
  Q
  ;
 view(msgID,seg,out) ;
- N code,i,len,rs,s,sExternal,viewName
+ N argList,argNames,argValues,arg,args,code,i,len,rs,s,sExternal,viewName
  S viewName=^objServerMsg(msgID,seg+1,0)
+ S argNames=^objServerMsg(msgID,seg+1,1)
+ S argValues=^objServerMsg(msgID,seg+1,2)
+ ;
+ F i=1:1:$L(argNames," ") S args($P(argNames," ",i))=$P(argValues," ",i)
+ ;
  S code="do^zq"_viewName
  Q:$T(@code)=""
- S code=code_"(.rs,.s)"
+ S argList=$$arglist^%rou($T(@code))
+ S code=code_"(.rs,.s"
+ ;
+ F i=1:1:$L(argList,",") D
+ . S arg=$G(args($P(argList,",",i)))
+ . S:arg'="" code=code_","_arg
+ . Q
+ ;
+ S code=code_")"
+ ;
  D @code
  S:$G(rs)'="" out($I(out))=rs
  S sExternal=$$sortToExternal^objQuery(.s),len=$L(sExternal,$C(31))
@@ -107,6 +121,27 @@ view(msgID,seg,out) ;
  . Q
  ; Use sort order specified.
  F i=1:1:len S out($I(out))=rs($P(sExternal,$C(31),i))
+ Q
+ ;
+find(msgID,seg,out) ;
+ N argNames,argValues,args,id,nok,objClass
+ S objClass=^objServerMsg(msgID,seg+1,0)
+ S argNames=^objServerMsg(msgID,seg+1,1)
+ S argValues=^objServerMsg(msgID,seg+1,2)
+ ;
+ F i=1:1:$L(argNames," ") S args($P(argNames," ",i))=$P(argValues," ",i)
+ ;
+ S out($I(out))=$$getSchema^%obj(objClass)
+ ;
+ S id="" F  S id=$$next^%obj(objClass,id) Q:id=""  D
+ . S arg="",nok=0 F  S arg=$O(args(arg)) Q:arg=""  Q:nok  D
+ . . I arg="id",id'=$$indirect^%var(args(arg)) S nok=1 Q
+ . . Q:arg="id"
+ . . S:$$getField^%obj(objClass,id,arg)'=$$indirect^%var(args(arg)) nok=1
+ . . Q
+ . S:'nok out($I(out))=$$getRaw^%obj(objClass,id)
+ . Q
+ ;
  Q
  ;
 listViews(msgID,seg,out) ;
