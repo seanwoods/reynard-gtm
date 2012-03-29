@@ -29,9 +29,11 @@ handleMsg(msgID) ; handle the given message
  S seg=0,done=0 F  Q:done  D
  . S len=^objServerMsg(msgID,seg,1)
  . S code=$G(^sObjDest(^objServerMsg(msgID,seg,0)))
- . S code=code_"(msgID,.seg,.out)"
  . S:code="" out="NOK"
- . I code'="" D @code
+ . D:code'=""
+ . . S code=code_"(msgID,.seg,.out)"
+ . . I code'="" D @code
+ . . Q
  . ;
  . ; Reset seg and len to process next logical message.
  . ;
@@ -61,6 +63,7 @@ initObjDest ; initialize verb destination table.
  S ^sObjDest("DELOBJ")="del^objNet"
  S ^sObjDest("QUERY")="query^objNet"
  S ^sObjDest("VIEW")="view^objNet"
+ S ^sObjDest("FINDOBJ")="find^objNet"
  S ^sObjDest("LISTOBJ")="list^objNet"
  S ^sObjDest("LISTOBJS")="listObjects^objNet"
  S ^sObjDest("LISTVIEWS")="listViews^objNet"
