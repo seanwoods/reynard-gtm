@@ -327,7 +327,8 @@ void dbserver_loop(char *bind_to) {
 }
 
 int main(int argc, char *argv[]) {
-    char *bind_to = "tcp://*:1841";
+    //char *bind_to = "tcp://*:1841";
+    char *bind_to = "ipc:///home/swoods/webapps/mbo_backend/dbsocket";
 
     dbserver_loop(bind_to);
 
