@@ -41,4 +41,6 @@ objSetup ; Set up supporting object structures.
  S:id="" id=$$alloc^%obj("SysUser")
  D set^%obj("SysUser",id,.o)
  ;
+ S ^sHooks("OnFile","*","onFile^objSchema")=1
+ ;
  Q
