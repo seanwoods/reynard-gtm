@@ -4,7 +4,7 @@
 
 export LD_LIBRARY_PATH=$(gtm_dist)
 
-GTMFLAGS=-I$(gtm_dist) -Ilib -L$(gtm_dist) -lgtmshr -lzmq
+GTMFLAGS=-I$(gtm_dist) -Ilib -L$(gtm_dist) -lgtmshr -L/home/swoods/lib -I/home/swoods/include -lzmq
 
 all: gtmci
 
