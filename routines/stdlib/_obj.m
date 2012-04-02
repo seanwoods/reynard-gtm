@@ -15,12 +15,12 @@ alloc(class) ; Allocate new object node.
  F  Q:($O(@glvn@(id))="")&($D(@glvn@(id))=0)  S id=$I(@glvn)
  Q id
  ;
-set(class,id,data) ; Set an object.
+set(class,id,data,setOnly) ; Set an object.
  N field,glvn,newFieldNumber,schema,temp
  S:$G(id)="" id=$$alloc(class)
  S glvn=$$glvn(class,"o"),schema=$$glvn(class,"d"),schemaX=$$glvn(class,"dx")
  M temp=data
- D deindex(class,id)
+ D:'$G(setOnly) deindex(class,id)
  ;
  ; Populate object data structures.
  ;
@@ -39,7 +39,8 @@ set(class,id,data) ; Set an object.
  . S $P(@glvn@(id),$C(31),newFieldNumber)=temp(field)
  . Q
  ;
- D index(class,id)
+ D:'$G(setOnly) index(class,id)
+ D:'$G(setOnly) fileEvents(class,id)
  ;
  Q
  ;
@@ -55,6 +56,7 @@ setExactObject(class,id,src) ; Set an object whose offsets correspond to schema
  . Q
  ;
  D index(class,id)
+ D fileEvents(class,id)
  ;
  Q
  ;
@@ -64,6 +66,7 @@ setPackedObject(class,id,packedString) ; Set an object from an object's string.
  D deindex(class,id)
  S @glvn@(id)=packedString
  D index(class,id)
+ D fileEvents(class,id)
  Q
  ;
 setSchema(class,src) ; Set the schema if we're sure of what it is.
@@ -106,7 +109,7 @@ xformVal(maptable,srcData) ; Transform packed value according to maptable.
 indexName(class,id) ; Populate indexes for an object.
  ; Indexes are ^sIndex(class,"fields.to.index")="target"
  N done,i,idxStruct,val
- S idxStruct=$$glvn(class,"x")
+ S idxStruct=$NA(@$$glvn(class,"x")@(idxName))
  S done=0 F i=1:1:$L(fields,".") Q:done  D
  . S val=$$getField(class,id,$P(fields,".",i))
  . I val="" S done=1 Q
@@ -116,20 +119,24 @@ indexName(class,id) ; Populate indexes for an object.
  Q $NA(@idxStruct@(id))
  ;
 index(class,id) ; Create index for object.
- N fields,idx
+ N fields,idx,idxName
  S class=$$norm(class)
- S fields="" F  S fields=$O(^sIndex(class,fields)) Q:fields=""  D
- . S idx=$$indexName(class,id)
- . S:idx'="" @idx=1
+ S idxName="" F  S idxName=$O(^sIndex(class,idxName)) Q:idxName=""  D
+ . S fields="" F  S fields=$O(^sIndex(class,idxName,fields)) Q:fields=""  D
+ . . S idx=$$indexName(class,id)
+ . . S:idx'="" @idx=1
+ . . Q
  . Q
  Q
  ;
 deindex(class,id) ; Remove indexes for object.
  N fields,idx
  S class=$$norm(class)
- S fields="" F  S fields=$O(^sIndex(class,fields)) Q:fields=""  D
- . S idx=$$indexName(class,id)
- . K:idx'="" @idx
+ S idxName="" F  S idxName=$O(^sIndex(class,idxName)) Q:idxName=""  D
+ . S fields="" F  S fields=$O(^sIndex(class,idxName,fields)) Q:fields=""  D
+ . . S idx=$$indexName(class,id)
+ . . K:idx'="" @idx
+ . . Q
  . Q
  Q
  ;
@@ -140,6 +147,17 @@ rebuildIndexes(class) ; Rebuild an object's indexes.
  S id="" F  S id=$O(@glvn@(id)) Q:id=""  D
  . D index(class,id)
  . Q
+ Q
+ ;
+fileEvents(class,id) ; Application-level events.
+ N code,i
+ F i="*",class D
+ . S code="" F  S code=$O(^sHooks("OnFile",i,code)) Q:code=""  D
+ . . Q:$T(@code)=""
+ . . S code=code_"(class,id)"
+ . . D @code
+ . . Q
+ . Q 
  Q
  ;
 get(class,id,data) ; Copy an object into `data` array.
