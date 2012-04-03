@@ -1,0 +1,6 @@
+- Auto ZLINK translated routine when updating a SysView object.
+- Sync local objects with remote objects via REST api.
+- Enable dot notation in views so that you can dereference pointers.
+- view^objNet should use $$qpiece
+- When you click "Save" for a new record it should take you back to the
+  record you were working on.
