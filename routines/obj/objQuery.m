@@ -31,7 +31,9 @@ opbuild(op1,op2) ;
  S op1("$")="$$ew^%str"
  S op1("ew")="$$ew^%str"
  S op1("in")="`["
- S op1("lin")="`'["
+ S op1("nin")="`'["
+ S op1("inl")="$$inList^%op"
+ S op1("ninl")="$$notInList^%op"
  ;
  S op2("AND")="&"
  S op2("OR")="!"
