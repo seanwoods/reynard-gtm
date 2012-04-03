@@ -131,7 +131,7 @@ find(msgID,seg,out) ;
  ;
  F i=1:1:$L(argNames," ") S args($P(argNames," ",i))=$P(argValues," ",i)
  ;
- S out($I(out))=$$getSchema^%obj(objClass)
+ S out($I(out))="id"_$C(31)_$$getSchema^%obj(objClass)
  ;
  S id="" F  S id=$$next^%obj(objClass,id) Q:id=""  D
  . S arg="",nok=0 F  S arg=$O(args(arg)) Q:arg=""  Q:nok  D
@@ -139,7 +139,7 @@ find(msgID,seg,out) ;
  . . Q:arg="id"
  . . S:$$getField^%obj(objClass,id,arg)'=$$indirect^%var(args(arg)) nok=1
  . . Q
- . S:'nok out($I(out))=$$getRaw^%obj(objClass,id)
+ . S:'nok out($I(out))=id_$C(31)_$$getRaw^%obj(objClass,id)
  . Q
  ;
  Q
