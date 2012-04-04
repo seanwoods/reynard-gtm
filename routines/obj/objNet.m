@@ -75,11 +75,11 @@ list(msgID,seg,out) ;
  Q
  ;
 enhancedSchema(msgID,seg,out) ;
- N cl,class,field,id,meta,rec,rs,schemaX,sort
+ N cl,class,count,field,id,meta,rec,rs,schemaX,sort
  S cl="" F  S cl=$O(^objServerMsg(msgID,seg+1,cl)) Q:cl=""  D
  . S class=^objServerMsg(msgID,seg+1,cl)
  . S schemaX=$$glvn^%obj(class,"dx")
- . D do^zqSystemFields(.rs,.sort,class)
+ . D do^zqSystemFields(.rs,.sort,.count,class)
  . S out($I(out))=class
  . S field="" F  S field=$O(@schemaX@(field)) Q:field=""  D
  . . S meta=$TR($G(rs(field)),$C(31),"^")
@@ -207,9 +207,9 @@ query(msgID,seg,out) ;
  Q
  ;
 pointers(msgID,seg,out) ;
- N class,dx,extra,fld,hit,obj,objClass,objID,rs,s
+ N c,class,dx,extra,fld,hit,obj,objClass,objID,rs,s
  S class=^objServerMsg(msgID,seg+1,0)
- D do^zqSystemPointers(.rs,.s,class)
+ D do^zqSystemPointers(.rs,.s,.c,class)
  S rs="" F  S rs=$O(rs(rs)) Q:rs=""  D
  . ; format is id, short_name, extra
  . S extra=$P(rs(rs),$C(31),3)
