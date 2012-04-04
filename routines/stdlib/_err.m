@@ -26,6 +26,10 @@ msg(msg) ; Display a message with lines under it.
  W !
  Q
  ;
+displayLast ; Display last error.
+ D display($O(^sErr(""),-1))
+ Q
+ ;
 display(errno) ; Display human-readable error info to $Io
  ; errno is either:
  ; - a name that points to the output of the ZSHOW command OR

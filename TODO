@@ -1,6 +1,18 @@
+- Select slices when lisiting an object or view.
+- Execute a view without translating.
+- Change import routine to accept a delimeted series of values that should
+  be made into persistent objects.
 - Auto ZLINK translated routine when updating a SysView object.
 - Sync local objects with remote objects via REST api.
 - Enable dot notation in views so that you can dereference pointers.
 - view^objNet should use $$qpiece
 - When you click "Save" for a new record it should take you back to the
   record you were working on.
+- Perfect DUMP routines, let you save objects to version control and restore
+  later.
+- Parameterize dbserver.c with global dir and topology.
+- Clean up the Makefile stupidity.
+- Manage dbserver service from within Reynard web server.
+  - Log dbserver pid to a file.
+  - Parameters in web routine for dbserver executable(s).
+  - Parameters in web routine for dbserver PID files.

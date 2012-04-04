@@ -8,11 +8,12 @@ glvn(class,prefix) ; Convert class name to global variable name.
  Q "^"_prefix_$$norm(class)
  ;
 alloc(class) ; Allocate new object node.
- N id,glvn
- S glvn=$$glvn(class,"o")
+ N id,glvn,meta
+ S class=$$norm(class),glvn=$$glvn(class,"o")
  S id=$I(@glvn)
  ; Make sure we have the latest number.
  F  Q:($O(@glvn@(id))="")&($D(@glvn@(id))=0)  S id=$I(@glvn)
+ S ^sMeta("num",class)=$G(^sMeta("num",class))+1
  Q id
  ;
 set(class,id,data,setOnly) ; Set an object.
@@ -211,6 +212,9 @@ extra(class,field) ;
 del(class,id) ;
  S glvn=$$glvn(class,"o")
  K @glvn@(id)
+ Q:$G(^sMeta("num",class))=""
+ Q:$G(^sMeta("num",class))=0
+ S ^sMeta("num",class)=$G(^sMeta("num",class))-1
  Q
  ;
 list(list) ;
@@ -225,6 +229,13 @@ list(list) ;
  ;
 next(class,id) ;
  Q $O(@$$glvn(class,"o")@(id))
+ ;
+recount(class) ;
+ N count,id
+ S count=0,class=$$norm(class)
+ S id="" F  S id=$$next(class,id) Q:id=""  S count=count+1
+ S ^sMeta("num",class)=count
+ Q
  ;
 nuke(class,noconfirm) ; Wipe out all data for a class.
  N glvn,i,sure

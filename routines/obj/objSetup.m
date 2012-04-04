@@ -28,18 +28,21 @@ objSetup ; Set up supporting object structures.
  S qu("sort")="description"
  ZL $$gen^objQuery(.qu)
  ;
- ; Ensure index for username is defined.
+ ; Define indexes
  S ^sIndex("SysUser","username")=1
+ S ^sIndex("SysView","name")=1
  ;
  ; Setup initial user
- K o
- S o("username")="root"
- S o("password")=""
- S o("fullname")="Root User"
- S o("changepw")="Y"
- S id=$O(^xSysUser("root",""))
- S:id="" id=$$alloc^%obj("SysUser")
- D set^%obj("SysUser",id,.o)
+ D:'$O(^xSysUser("Username","root",""))
+ . K o
+ . S o("username")="root"
+ . S o("password")=""
+ . S o("fullname")="Root User"
+ . S o("changepw")="Y"
+ . S id=$O(^xSysUser("root",""))
+ . S:id="" id=$$alloc^%obj("SysUser")
+ . D set^%obj("SysUser",id,.o)
+ . Q
  ;
  S ^sHooks("OnFile","*","onFile^objSchema")=1
  ;

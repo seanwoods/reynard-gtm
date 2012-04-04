@@ -167,13 +167,14 @@ gen(query) ;
  W " Q",!
  W " ;",!
  ; Generate function signature.
- W "do(%rs,%sort"
+ W "do(%rs,%sort,%count"
  S var="" F  S var=$O(names("V",var)) Q:var=""  D
  . W ","_$$cvtId(var)
  . Q
  W ") ; ",!
  ;
  W " N %i1,%ok",!
+ W " S %count=0",!
  ;
  D:$G(query("emitFields"))
  . W " S rs=""id""",!
@@ -181,6 +182,8 @@ gen(query) ;
  . . W " S rs=rs_$C(31)_"_$$repr^%str($P(query("fields")," ",i)),!
  . . Q
  . Q
+ ;
+ ; Write the outer loop.
  ;
  W $$mkLoop($NA(%i1),query("class")),! S lev=lev+1
  ;
@@ -206,6 +209,7 @@ gen(query) ;
  ;
  ; Set result set variable, %rs, with data to extract.
  ;
+ W " . S %count=%count+1",!  ; This is the "record count."
  S var=$S($G(query("indexBy"))'="":$$cvtId(query("indexBy")),1:"%i1")
  W " . S %rs("_var_")=%i1",!
  F i=1:1:$L(query("fields")," ") D

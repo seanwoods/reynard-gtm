@@ -52,15 +52,23 @@ del(msgID,seg,out) ;
  Q
  ;
 list(msgID,seg,out) ;
- N cl,class,id,glvn
+ N cl,class,done,id,glvn,recNum,slice
  S out=0
  S cl="" F  S cl=$O(^objServerMsg(msgID,seg+1,cl)) Q:cl=""  D
- . S class=^objServerMsg(msgID,seg+1,cl)
+ . S class=$P(^objServerMsg(msgID,seg+1,cl),$C(31),1)
+ . ; Slice in the form of one integer (top x) or x:y
+ . S slice=$P(^objServerMsg(msgID,seg+1,cl),$C(31),2)
+ . ; TODO validate `slice`
  . S glvn=$$glvn^%obj(class,"o")
  . S:$O(^objServerMsg(msgID,seg+1,cl),-1)'="" out($I(out))=$C(29)
- . S out($I(out))=class
+ . S out($I(out))=class_$C(31)_$G(^sMeta("num",$$norm^%obj(class)),-1)
  . S out($I(out))="id"_$C(31)_$$getSchema^%obj(class)
- . S id="" F  S id=$O(@glvn@(id)) Q:id=""  D
+ . S done=0,recNum=0
+ . S id="" F  S id=$O(@glvn@(id)) Q:done!(id="")  D
+ . . S recNum=recNum+1
+ . . I slice'="",$L(slice,":")=1,recNum>slice S done=1 Q
+ . . I slice'="",$L(slice,":")=2,recNum<$P(slice,":",1) Q
+ . . I slice'="",$L(slice,":")=2,recNum>$P(slice,":",2) S done=1 Q
  . . S out($I(out))=id_$C(31)_$$getRaw^%obj(class,id)
  . . Q
  . Q
@@ -94,8 +102,10 @@ listObjects(msgID,seg,out) ;
  Q
  ;
 view(msgID,seg,out) ;
- N argList,argNames,argValues,arg,args,code,i,len,rs,s,sExternal,viewName
- S viewName=^objServerMsg(msgID,seg+1,0)
+ N argList,argNames,argValues,arg,args,c,code,i
+ N len,recNum,rs,s,slice,sExternal,viewName
+ S viewName=$P(^objServerMsg(msgID,seg+1,0),$C(31),1)
+ S slice=$P(^objServerMsg(msgID,seg+1,0),$C(31),2)
  S argNames=^objServerMsg(msgID,seg+1,1)
  S argValues=^objServerMsg(msgID,seg+1,2)
  ;
@@ -104,7 +114,7 @@ view(msgID,seg,out) ;
  S code="do^zq"_viewName
  Q:$T(@code)=""
  S argList=$$arglist^%rou($T(@code))
- S code=code_"(.rs,.s"
+ S code=code_"(.rs,.s,.c"
  ;
  F i=1:1:$L(argList,",") D
  . S arg=$G(args($P(argList,",",i)))
@@ -114,13 +124,27 @@ view(msgID,seg,out) ;
  S code=code_")"
  ;
  D @code
+ S out($I(out))=c
  S:$G(rs)'="" out($I(out))=rs
+ S (done,recNum)=0
  S sExternal=$$sortToExternal^objQuery(.s),len=$L(sExternal,$C(31))
  I sExternal="" D  Q
- . S i="" F  S i=$O(rs(i)) Q:i=""  S out($I(out))=rs(i)
+ . S i="" F  S i=$O(rs(i)) Q:done!(i="")  D
+ . . S recNum=recNum+1
+ . . I slice'="",$L(slice,":")=1,recNum>slice S done=1 Q
+ . . I slice'="",$L(slice,":")=2,recNum<$P(slice,":",1) Q
+ . . I slice'="",$L(slice,":")=2,recNum>$P(slice,":",2) S done=1 Q
+ . . S out($I(out))=rs(i)
+ . . Q
  . Q
  ; Use sort order specified.
- F i=1:1:len S out($I(out))=rs($P(sExternal,$C(31),i))
+ F i=1:1:len Q:done  D
+ . S recNum=recNum+1
+ . I slice'="",$L(slice,":")=1,recNum>slice S done=1 Q
+ . I slice'="",$L(slice,":")=2,recNum<$P(slice,":",1) Q
+ . I slice'="",$L(slice,":")=2,recNum>$P(slice,":",2) S done=1 Q
+ . S out($I(out))=rs($P(sExternal,$C(31),i))
+ . Q
  Q
  ;
 find(msgID,seg,out) ;
