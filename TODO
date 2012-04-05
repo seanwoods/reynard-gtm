@@ -1,5 +1,3 @@
-- Select slices when lisiting an object or view.
-- Execute a view without translating.
 - Change import routine to accept a delimeted series of values that should
   be made into persistent objects.
 - Auto ZLINK translated routine when updating a SysView object.

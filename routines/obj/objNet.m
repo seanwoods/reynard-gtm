@@ -111,23 +111,30 @@ view(msgID,seg,out) ;
  ;
  F i=1:1:$L(argNames," ") S args($P(argNames," ",i))=$P(argValues," ",i)
  ;
- S code="do^zq"_viewName
- Q:$T(@code)=""
- S argList=$$arglist^%rou($T(@code))
- S code=code_"(.rs,.s,.c"
- ;
- F i=1:1:$L(argList,",") D
- . S arg=$G(args($P(argList,",",i)))
- . S:arg'="" code=code_","_arg
+ D:$G(^sParam("UseTranslatedViews"),0)=1
+ . S code="do^zq"_viewName
+ . Q:$T(@code)=""
+ . S argList=$$arglist^%rou($T(@code))
+ . S code=code_"(.rs,.s,.c"
+ . ;
+ . F i=1:1:$L(argList,",") D
+ . . S arg=$G(args($P(argList,",",i)))
+ . . S:arg'="" code=code_","_arg
+ . . Q
+ . ;
+ . S code=code_")"
+ . ;
+ . D @code
  . Q
  ;
- S code=code_")"
+ D:$G(^sParam("UseTranslatedViews"),0)=0
+ . D execFromDB^objQuery(viewName,.rs,.s,.c,.args)
+ . Q
  ;
- D @code
  S out($I(out))=c
  S:$G(rs)'="" out($I(out))=rs
  S (done,recNum)=0
- S sExternal=$$sortToExternal^objQuery(.s),len=$L(sExternal,$C(31))
+ S sExternal=$$sortToExternal^objQueryLib(.s),len=$L(sExternal,$C(31))
  I sExternal="" D  Q
  . S i="" F  S i=$O(rs(i)) Q:done!(i="")  D
  . . S recNum=recNum+1
@@ -172,7 +179,7 @@ listViews(msgID,seg,out) ;
  N i,len,rs,s,sExternal
  D do^zqSystemViews(.rs,.s)
  Q:$D(rs)=0
- S sExternal=$$sortToExternal^objQuery(.s),len=$L(sExternal,$C(31))
+ S sExternal=$$sortToExternal^objQueryLib(.s),len=$L(sExternal,$C(31))
  F i=1:1:len S out($I(out))=rs($P(sExternal,$C(31),i))
  Q
  ;
@@ -197,12 +204,12 @@ query(msgID,seg,out) ;
  ; Sort order e.g. age last_name
  S query("sort")=^objServerMsg(msgID,seg+5,0)
  ;
- S code=$$gen^objQuery(.query)
+ S code=$$translate^objQuery(.query)
  S code="do^"_code_"(.out,.sort)"
  D @code
  ;
  S out("-99")=query("class")
- S out("-98")=$$sortToExternal^objQuery(.sort)
+ S out("-98")=$$sortToExternal^objQueryLib(.sort)
  ;
  Q
  ;

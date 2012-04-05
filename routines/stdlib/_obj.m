@@ -17,7 +17,7 @@ alloc(class) ; Allocate new object node.
  Q id
  ;
 set(class,id,data,setOnly) ; Set an object.
- N field,glvn,newFieldNumber,schema,temp
+ N field,glvn,newFieldNumber,offset,schema,schemaX,temp
  S:$G(id)="" id=$$alloc(class)
  S glvn=$$glvn(class,"o"),schema=$$glvn(class,"d"),schemaX=$$glvn(class,"dx")
  M temp=data
@@ -131,7 +131,7 @@ index(class,id) ; Create index for object.
  Q
  ;
 deindex(class,id) ; Remove indexes for object.
- N fields,idx
+ N fields,idx,idxName
  S class=$$norm(class)
  S idxName="" F  S idxName=$O(^sIndex(class,idxName)) Q:idxName=""  D
  . S fields="" F  S fields=$O(^sIndex(class,idxName,fields)) Q:fields=""  D
@@ -172,6 +172,7 @@ get(class,id,data) ; Copy an object into `data` array.
  Q
  ;
 getField(class,id,field) ; Get an object field's value.
+ N glvn,schema,schemaX
  S glvn=$$glvn(class,"o"),schema=$$glvn(class,"d"),schemaX=$$glvn(class,"dx")
  ;
  Q:$G(@glvn@(id))="" ""

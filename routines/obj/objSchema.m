@@ -2,7 +2,7 @@ objSchema ;
  Q
  ;
 onFile(class,id) ;
- N dx,glvn,fld,src,val
+ N dest,dx,glvn,fld,src,val
  S glvn=$$glvn^%obj(class,"o"),dx=$$glvn^%obj(class,"dx")
  S dest="" F  S dest=$O(^xSysSchema("ObjExtraX",class,"SL",dest)) Q:dest=""  D
  . S src=$P($O(^xSysSchema("ObjExtraX",class,"SL",dest,""))," ",1)

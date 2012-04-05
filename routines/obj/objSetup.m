@@ -9,7 +9,7 @@ objSetup ; Set up supporting object structures.
  S qu("fields")="short_name caption datatype extra"
  S qu("indexBy")="short_name"
  S qu("sort")="short_name"
- ZL $$gen^objQuery(.qu)
+ ZL $$translate^objQuery(.qu)
  ;
  ; Query all pointer objects
  K qu
@@ -18,7 +18,7 @@ objSetup ; Set up supporting object structures.
  S qu("crit")="datatype = ""P"" OR datatype = ""PM"" AND object = $class"
  S qu("fields")="short_name extra"
  S qu("indexBy")="short_name"
- ZL $$gen^objQuery(.qu)
+ ZL $$translate^objQuery(.qu)
  ;
  ; Query all views
  K qu
@@ -26,11 +26,11 @@ objSetup ; Set up supporting object structures.
  S qu("class")="sysView"
  S qu("fields")="name description"
  S qu("sort")="description"
- ZL $$gen^objQuery(.qu)
+ ZL $$translate^objQuery(.qu)
  ;
  ; Define indexes
- S ^sIndex("SysUser","username")=1
- S ^sIndex("SysView","name")=1
+ S ^sIndex("SysUser","Username","username")=1
+ S ^sIndex("SysView","Name","name")=1
  ;
  ; Setup initial user
  D:'$O(^xSysUser("Username","root",""))
