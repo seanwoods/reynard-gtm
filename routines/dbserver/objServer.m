@@ -61,6 +61,7 @@ initObjDest ; initialize verb destination table.
  S ^sObjDest("SETOBJ")="set^objNet"
  S ^sObjDest("GETOBJ")="get^objNet"
  S ^sObjDest("DELOBJ")="del^objNet"
+ S ^sObjDest("DELCRIT")="delCrit^objNet"
  S ^sObjDest("QUERY")="query^objNet"
  S ^sObjDest("VIEW")="view^objNet"
  S ^sObjDest("FINDOBJ")="find^objNet"

@@ -23,6 +23,7 @@ set(msgID,seg,out) ;
  . . I id="" S id=$$alloc^%obj(class)
  . . S data=$$xformVal^%obj(.maptable,data)
  . . D setPackedObject^%obj(class,id,.data)
+ . . S out($I(out))=id
  . . Q
  . Q
  ;
@@ -49,6 +50,25 @@ del(msgID,seg,out) ;
  . . F i=1:1:$L(id,$C(31)) D del^%obj(class,$P(id,$C(31),i))
  . . Q
  . Q
+ Q
+ ;
+delCrit(msgID,seg,out) ;
+ N %class,%crit,%names,%id,%objs,%ok,%query,%schemaX
+ S %class=^objServerMsg(msgID,seg+1,0)
+ S %objs=$$glvn^%obj(%class,"o"),%schemaX=$$glvn^%obj(%class,"dx")
+ S %query("crit")=^objServerMsg(msgID,seg+1,1)
+ S %crit=$$mkCrit^objQueryLib(.%query,.%names)
+ ;
+ S %id="" F  S %id=$O(@%objs@(%id)) Q:%id=""  D
+ . S %C="" F  S %C=$O(%names("C",%C)) Q:%C=""  N @%C D
+ . . S @(%C_"="_$$repr^%str($$getField^%obj(%class,%id,%C)))
+ . . Q
+ . S @("%ok="_%crit)
+ . Q:'%ok
+ . D deindex^%obj(%class,%id)
+ . K @%objs@(%id)
+ . Q
+ ;
  Q
  ;
 list(msgID,seg,out) ;
