@@ -238,6 +238,14 @@ recount(class) ;
  S ^sMeta("num",class)=count
  Q
  ;
+recountAll ;
+ N glvn
+ S glvn="^o" F  S glvn=$O(@glvn) Q:'$$sw^%str(glvn,"^o")  D
+ . Q:'$$isUpper^%str($E(glvn,3))
+ . D recount($E(glvn,3,$L(glvn)))
+ . Q
+ Q
+ ;
 nuke(class,noconfirm) ; Wipe out all data for a class.
  N glvn,i,sure
  S sure=1

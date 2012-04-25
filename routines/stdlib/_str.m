@@ -50,6 +50,10 @@ isUpper(c) Q ($A(c)>64)&($A(c)<90)
 
 isLower(c) Q ($A(c)>96)&($A(c)<123)
 
+isSymbol(c) ;
+ S c=$A(c)
+ Q ((c>32)&(c<48))!((c>90)&(c<97))!((c>122)&(c<127))
+
 isIdentifier(c) ;
  Q:$$isUpper(c) 1
  Q:$$isLower(c) 1

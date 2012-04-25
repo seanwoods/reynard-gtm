@@ -53,7 +53,7 @@ del(msgID,seg,out) ;
  Q
  ;
 delCrit(msgID,seg,out) ;
- N %class,%crit,%names,%id,%objs,%ok,%query,%schemaX
+ N %class,%crit,%names,%id,%objs,%ok,%query,%schemaX,%x
  S %class=^objServerMsg(msgID,seg+1,0)
  S %objs=$$glvn^%obj(%class,"o"),%schemaX=$$glvn^%obj(%class,"dx")
  S %query("crit")=^objServerMsg(msgID,seg+1,1)
@@ -66,6 +66,13 @@ delCrit(msgID,seg,out) ;
  . S @("%ok="_%crit)
  . Q:'%ok
  . D deindex^%obj(%class,%id)
+ . ;
+ . S %class=$$uc^%str($E(%class,1))_$E(%class,2,$L(%class))
+ . D:$D(^sMeta("num",%class))>0
+ . . S %x=$G(^sMeta("num",%class))
+ . . S ^sMeta("num",%class)=$S((%x="")!(%x=0):0,1:%x-1)
+ . . Q
+ . ;
  . K @%objs@(%id)
  . Q
  ;
