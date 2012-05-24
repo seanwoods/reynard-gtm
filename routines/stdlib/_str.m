@@ -52,7 +52,7 @@ isLower(c) Q ($A(c)>96)&($A(c)<123)
 
 isSymbol(c) ;
  S c=$A(c)
- Q ((c>32)&(c<48))!((c>90)&(c<97))!((c>122)&(c<127))
+ Q ((c>32)&(c<48))!((c>57)&(c<65))!((c>90)&(c<97))!((c>122)&(c<127))
 
 isIdentifier(c) ;
  Q:$$isUpper(c) 1
@@ -62,7 +62,7 @@ isIdentifier(c) ;
  Q 0
 
 isValidIdentifier(str) ;
- Q:$E(str,1)?.N 0
+ Q:'$$isAlpha($E(str,1)) 0
  N i,ok
  S ok=1
  F i=1:1:$L(str) D
@@ -70,6 +70,10 @@ isValidIdentifier(str) ;
  . I '$$isIdentifier($E(str,i)) S ok=0
  . Q
  Q ok
+
+isValidNumber(num) ;
+ I $E(num,1)="-" S num=$E(num,2,$L(num))
+ Q $TR(num,".","")?.N
 
 repr(in) ; Printable representation of string, suitable for evaluation.
  N c,mode,out
