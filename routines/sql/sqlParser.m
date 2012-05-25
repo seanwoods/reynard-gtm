@@ -5,24 +5,29 @@ fail(reason);
  S $EC=",U999-"_reason_","
  Q
  ;
+reset(self) ; Reset current pointer to nil.
+ S self("cur")="",self("EndOfStream")=0
+ Q
+ ;
 nextPart(self,cap) ; Return next part.
  N next
  S next=$O(self("parsed",self("cur")))
+ s x=self("cur")
  S self("cur")=next
- Q:next="" ""
+ I next="" S self("EndOfStream")=1 Q ""
  Q:$G(cap)'="" $$uc^%str(self("parsed",next))
  Q self("parsed",next)
  ;
 peekPart(self,cap) ; Peek to next part but don't increment current pointer.
  N next
  S next=$O(self("parsed",self("cur")))
- Q:next="" ""
+ I next="" Q ""
  Q:$G(cap)'="" $$uc^%str(self("parsed",next))
  Q self("parsed",next)
  ;
-killPart(self) ; Discart current part and increment pointer.
+killPart(self) ; Discard current part and increment pointer.
  N next S next=$O(self("parsed",self("cur")))
- Q:next="" ""
+ I next="" S self("EndOfStream")=1 Q ""
  Q
  ;
 whereClause(self) ; Parse a WHERE clause.
@@ -52,13 +57,14 @@ parse(self) ; Entry point for parsing.
  Q
  ;
 select(self) ;
- N done,expectComma,state
+ N expectComma,state
  ;
  ; SELECT  FIELDREFS         TABLE          WHERE             ORDER
  ; SELECT  *            FROM coord   WHERE  x > 100  ORDER BY name, date ASC
  ;
- S done=0,expectComma=0,state="FIELDREFS",self("cur")=1
- F  S part=$$nextPart(.self) Q:(part="")!(done)  D
+ S expectComma=0,state="FIELDREFS"
+ D reset(.self)
+ F  S part=$$nextPart(.self) Q:self("EndOfStream")  D
  . I state="FIELDREFS" D  Q
  . . I part="FROM" S state="TABLE" Q
  . . I part="*" S state="TABLE" Q  ; TODO
@@ -102,7 +108,7 @@ select(self) ;
  . . S B="Expected comma, ""ASC"", or ""DESC"" here."
  . . S C="Expected comma here."
  . . ;
- . . F  S part=$$nextPart(.self)  S:part="" done=1 Q:part=""  D
+ . . F  S part=$$nextPart(.self)  Q:self("EndOfStream")  D
  . . . ; Expecting a valid identifier.
  . . . I 'expectComma,'$$isValidIdentifier^%str(part) D fail(A)
  . . . ;
