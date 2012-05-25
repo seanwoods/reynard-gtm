@@ -91,10 +91,12 @@ critFlushBuf(buf) ;
  ;
 mkCrit(query,names) ;
  Q:$G(query("crit"))="" ""
+ Q $$mkCritFromString(query("crit"),.names)
  ;
+mkCritFromString(string,names);
  N buf,crit,expect,len,op1,op2,out,part
  S buf=""
- S crit=$$condense^%str(query("crit")),len=$$qlen^%str(crit," "),expect="t1"
+ S crit=$$condense^%str(string),len=$$qlen^%str(crit," "),expect="t1"
  D opbuild(.op1,.op2)
  ; expect = {"t","op1","op2"}
  ;

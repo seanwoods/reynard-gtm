@@ -18,7 +18,7 @@ if [ -z "$gtm_dist" ]; then
     return
 fi
 
-# TODO May need to remvoe test for writable when shared libraries are used.
+# TODO May need to remove test for writable when shared libraries are used.
 
 if [ ! -w "$gtm_dist" ]; then
     echo "Error: $gtm_dist is not writable by this user.  Programs won't compile."
@@ -206,7 +206,8 @@ fi
 # Set up Unicode handling, if applicable.
 
 if [ `basename $gtm_dist` = 'utf8' ]; then
-    export gtm_icu_version=$(echo `icu-config --version` | cut -d '.' -f 1,2)
+    #export gtm_icu_version=$(echo `icu-config --version` | cut -d '.' -f 1,2)
+    export gtm_icu_version="4.9"
     export gtm_chset=UTF-8
     export LC_CTYPE=en_US.utf8
     export LC_ALL=en_US.utf8
