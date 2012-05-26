@@ -1,4 +1,5 @@
 *.o
 bin/_dbserver
+bin/gtm_fastcgi
 globals/*
 routines/queries/*

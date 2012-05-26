@@ -1,0 +1,14 @@
+# Setting up a GT.M Web Service
+
+Suppose you want a new service named `spw`.  Do all of the following as the
+superuser:
+    
+    mkdir /srv/spw
+    chmod 775 /srv/spw
+    chown http:http /srv/spw
+    gpasswd -a swoods http
+
+Now you want this service to be an MEnv environment:
+
+    cd /srv/spw
+    menv init
