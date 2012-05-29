@@ -1,4 +1,15 @@
 %web ; High-level Web API
+ ; This file provides high-level functions for interfacing with the
+ ; World Wide Web.  It provides many of the "framework" type functions
+ ; without getting in the programmer's way.  It also abstracts away
+ ; interface-specific details (FastCGI vs. CGI).
+ ;
+ ; Important Note: Request state is stored in the `%req` variable, which
+ ; should always be available when these functions are called.  You can
+ ; modify `%req` directly, but make sure you know what you are doing.
+ ; If there is a function in this file to do what you want, use that before
+ ; resorting to modifying `%req`.
+ ;
  Q
  ;
 env(name) ; Read a server environment variable.
@@ -13,10 +24,10 @@ data(name,num) ; Read a request variable (from GET and POST).
  I $G(num)="" S num=%req("data",name)
  Q %req("data",name,num)
  ;
-header(header) ;
+header(header) ; Retrieve a header value.
  Q $$env($TR($$uc^%str(header),"-","_"))
  ;
-send(data,noNewLine,escape) ;
+send(data,noNewLine,escape) ; Send data to client.
  S:$G(escape)=1 data=$$HTMLout^%cgi(data)
  S:$G(noNewLine)'=1 data=data_$C(13,10)
  ;
@@ -25,7 +36,7 @@ send(data,noNewLine,escape) ;
  S $EC=",U03-Unknown transport type.,"
  Q
  ;
-showEnvironment ;
+showEnvironment ; Show the current environment as a series of HTML tables.
  N p,param,paramNum
  ;
  S paramNum=-1 F  S paramNum=$&fastcgi.nextParam(paramNum) Q:paramNum<0  D
@@ -81,14 +92,13 @@ showEnvironment ;
  ;
  Q
  ;
-parseData ;
+parseData ; Parse data from query string and request body.
  N d,data,i
  S data=""
  ;
  I $L($$env("QUERY_STRING"))>0 D processData($$env("QUERY_STRING"))
  ;
- I $$env("REQUEST_METHOD")="POST" D
- . Q:$$env("CONTENT_LENGTH")<1
+ D:+$$env("CONTENT_LENGTH")>0
  . I $G(%req("transport"))="FastCGI" D  Q
  . . ; TODO need to ensure this handles UTF-8 properly.
  . . F i=1:1:$$env("CONTENT_LENGTH") S data=data_$C($&fastcgi.getChar())
@@ -105,7 +115,7 @@ parseData ;
  ;
  Q
  ;
-processData(data) ;
+processData(data) ; Parse an argument string and populate `%req`.
  F i=1:1:$L(data,"&") D
  . N ind,pc,val
  . S pc=$P(data,"&",i)
