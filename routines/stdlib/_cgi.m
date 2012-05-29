@@ -1,10 +1,11 @@
 %cgi ; CGI Handling Routines
+ ; @impure %req
  ; Adapted from similar routines by Ed de Moel.
  N i,data,entry
  W "Content-Type: text/html",!,!
  S $ZT="D err^"_$T(+0)_"($ZSTATUS)"
  ;
- I $ZTRNLNM("REQUEST_METHOD")="POST" D
+ I ("REQUEST_METHOD")="POST" D
  . R data#$ZTRNLNM("CONTENT_LENGTH"):5
  . Q
  E  D
@@ -15,10 +16,9 @@
  . N ind,pc,val
  . S pc=$P(data,"&",i)
  . S ind=$$URLin($P(pc,"=",1)),val=$$URLin($P(pc,"=",2))
- . S:ind'="" %request("data",ind)=val
+ . S:ind'="" %req("data",ind)=val
  . Q
  ;
- W "Oh hai!",!
  Q
  ;
 err(msg) ; Output error message
@@ -69,4 +69,34 @@ HTMLout(html) ; Escape special HTML characters.
  . S r=r_e
  . Q
  Q r
+ ;
+envVars(env) ;
+ S env("DOCUMENT_ROOT")=1
+ S env("GATEWAY_INTERFACE")=1
+ S env("HOME")=1
+ S env("HTTP_ACCEPT")=1
+ S env("HTTP_ACCEPT_CHARSET")=1
+ S env("HTTP_ACCEPT_ENCODING")=1
+ S env("HTTP_ACCEPT_LANGUAGE")=1
+ S env("HTTP_CONNECTION")=1
+ S env("HTTP_HOST")=1
+ S env("HTTP_USER_AGENT")=1
+ S env("PATH")=1
+ S env("PATH_INFO")=1
+ S env("PATH_TRANSLATED")=1
+ S env("QUERY_STRING")=1
+ S env("REMOTE_ADDR")=1
+ S env("REMOTE_PORT")=1
+ S env("REQUEST_METHOD")=1
+ S env("REQUEST_URI")=1
+ S env("SCRIPT_FILENAME")=1
+ S env("SCRIPT_NAME")=1
+ S env("SERVER_ADDR")=1
+ S env("SERVER_ADMIN")=1
+ S env("SERVER_NAME")=1
+ S env("SERVER_PORT")=1
+ S env("SERVER_PROTOCOL")=1
+ S env("SERVER_SIGNATURE")=1
+ S env("SERVER_SOFTWARE")=1
+ Q
  ;
