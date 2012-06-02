@@ -1,10 +1,18 @@
 %err ; Standard error handling routines.
- ; Set $ZTRAP="GOTO ^%err" to log errors to standard globals for later viewing.
- ;S $ZT="G bail^%err"
- S err=$I(^sErr)
- S ^sErr(err)=$H_" "_$J_" "_$EC
- ZSHOW "*":^sErr(err)
- Q:$Q err
+ ; To use standard error trapping, Set $ZT="G ^%err"
+ S $ZT="Q"
+ TRO:$TL>0
+ N %zerr
+ S %zerr=$I(^sErr)
+ ZSH "*":^sErr(%zerr)
+ S ^sErr(%zerr)=$H_" "_$J_" "_$EC
+ S $EC=",U999-Error info available in "_$NA(^sErr(%zerr))_","
+ Q
+ N T
+ S T="TRO:$TL>0  S err=$I(^sErr) ZSHOW ""*"":^sErr(err) "
+ S T=T_"S ^sErr(err)=$H_"" ""_$J_"" ""_$EC "
+ S T=T_"S $EC="",U999-Error info available in #""_err_"","""
+ S $ZT=T
  Q
  ;
 ci() ; Save error from call-in
