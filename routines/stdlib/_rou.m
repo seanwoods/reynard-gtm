@@ -9,3 +9,6 @@ arglist(tag) ;
  Q:r=0 ""                       ; Something is messed up here.
  Q $E(tag,l,r-2)
  ;
+hasTag(code,tag) ;
+ Q $T(@(tag_code))'=""
+ ;

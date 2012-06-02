@@ -63,18 +63,26 @@
  ;
  D parseData
  ;
+ I $T(@("onHeader"_code))'="" D @("onHeader"_code)
+ ;
  S header="" F  S header=$O(%resp("headers",header)) Q:header=""  D
  . S:$$uc^%str(header)="CONTENT-TYPE" contentTypeSent=1
  . D send(header_": "_%resp("headers",header))
  . Q
  ;
  D:$G(contentTypeSent)'=1 send("Content-type: text/html")
- ;
  D send("")
- D send("<p>")
- D send($$resolveRoute($$env("PATH_INFO")))
- D send("</p>")
- D showEnvironment
+ ;
+ I $T(@code)="" D  Q
+ . D send("<!doctype html>")
+ . D send("<h1>Routine "_code_" Not Found</h1>")
+ . D showEnvironment
+ . Q
+ ;
+ S tag="on"_$$env("REQUEST_METHOD")
+ I $$hasTag^%rou(code,tag) D @(tag_code) Q
+ ;
+ D @code
  ;
  Q
  ;
