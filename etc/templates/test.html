@@ -1,0 +1,15 @@
+<#
+ goto body
+someFunction(in1,in2) ;
+ Quit in1_in2
+ ;
+body ;
+ New x,xxy
+#>
+<!doctype html>
+<html>
+The dog is ${ $$data^%web("dog") }!
+<% set x="" for  set x=$order(^sWebRoute(x)) quit:x=""  do %>
+The quick brown <% x %> jumps over the lazy <% ^sWebRoute(x) %>.
+<% end %>
+</html>
