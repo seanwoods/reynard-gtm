@@ -1,166 +1,75 @@
-tpl ; Template Transformation Library
- ;
- ; Templates are text files that are translated to M code.
- ; 
- ; Rules
- ; -----
- ;  * Execution begins at the top of the file.  Use '%mumps' directives
- ;    (see below) to insert subroutines, functions, etc.
- ;  * `New (vars)` is inserted before any commands to control local variables.
- ;  * Each non-M line is translated into an expression that outputs the
- ;    current line to the HTTP response.
- ;  * Insert variables with ${var} syntax.  These will be translated to
- ;    `$Get(var,"??")`, so if you see "??" in your output, you'll know why.
- ;  * If a line starts with '%', the line is treated as M code and copied
- ;    into the output at the proper indentation level.
- ;  * If a line begins with a '%' as above and ends with a do command, another
- ;    level of indentation gets triggered (leading dots).
- ;  * If a line begins with '%mumps', that line is translated into a blank
- ;    comment in the output and all subsequent lines up to an '%end' line
- ;    (see below) are copied verbatim to the translated result.
- ;  * If a line starts with '%end' and the generator is in "M Mode" from a
- ;    previous '%mumps', the '%mumps' action is undone and the generator goes
- ;    back to its default behavior.
- ;  * If a line starts with '%end' and the generator is NOT in "M Mode",
- ;    the indentation level is reduced and the generator inserts a quit
- ;    command to terminate the current syntactic block.
- ; 
+%tpl ;
  Q
  ;
-escape(str) ; Return quoted version of string with internal quotes escaped.
- N loc
- S loc=1
- F  S loc=$F(str,"""",loc) Q:loc=0  S $E(str,loc-1)="""""",loc=loc+1
- Q """"_str_""""
+findNonWs(line,dir) ;
+ S:$G(dir)="" dir=1
+ S:$G(dir)=0 dir=1
+ N i,pos
+ S pos=0
+ I dir>0 F i=1:1:$L(line) Q:pos>0  I '$$ws^%str($E(line,i)) S pos=i Q
+ I dir<0 F i=$L(line):-1:1 Q:pos>0  I '$$ws^%str($E(line,i)) S pos=i Q
+ Q pos
  ;
-wsSw(str,searchFor) ;
- N i,ws
- S ws=" "_$C(9,10,13)
- F i=1:1:$L(str) Q:ws'[$E(str,i)
- Q $E(str,i,i+$L(searchFor)-1)=searchFor
- ;
-wsEw(str,searchFor) ;
- Q $$wsSw($RE(str),$RE(searchFor))
- ;
-ltrim(str) ;
- N i,ws S ws=" "_$C(9,10,13)
- F i=1:1:$L(str) Q:ws'[$E(str,i)
- Q:i=$L(str) str
- Q $E(str,i,$L(str))
- ;
-lev(level) ; Write out prefix characters corresponding to current DO level.
+lev(lev) ;
  N i,out
  S out=" "
- F i=1:1:level S out=out_". "
+ F i=1:1:lev S out=out_". "
  Q out
  ;
-log(message,to,from) ;
- U to
- W message,!
- U from
+translate(inFile,outDir) ; Translate a template.
+ N outFile
+ S:$E(outDir,$L(outDir))'="/" outDir=outDir_"/"
+ S outFile=outDir_$ZPARSE(inFile,"NAME")_".m"
+ O outFile:NEWVERSION
+ D processFile(inFile)
+ C outFile
  Q
  ;
-cmd ;
- D translate($P($ZCMDLINE," ",1))
- Q
+processFile(filename) ; Translate template from file to $IO
+ N io,mumpsMode,lev
+ S io=$I,mumpsMode=0,lev=0
+ W $ZPARSE(filename,"NAME")_" ;",!
  ;
-translate(sourcePath) ;
- N destPath
- I $G(^sParam("tplc"))'="" D
- . S destPath=^sParam("tplc")_"/"_$$mkOutputName(sourcePath)_".m"
- . O destPath:NEWFILE U destPath
- . Q
- D translateToIo(sourcePath)
- C destPath
- Q
+ O filename U filename
+ F  R line Q:$ZEOF  U io D processLine(line,.mumpsMode,.lev) U filename
+ U io C filename
  ;
-mkOutputName(sourcePath) ;
- N name
- S name=$ZParse(sourcePath,"NAME")
- S $E(name,1)=$ZCONVERT($E(name,1),"U")
- Q "tpl"_name
- ;
-translateToIo(src) ;
- N io,line,level,mumpsMode,out
- S io=$Io,mumpsMode=0
- ;
- W $$mkOutputName(src),!
- W " N (%req,%resp,vars)",!
- ;
- O src U src
- F  R line Q:$ZEOF  D
- . S out=$$parseLine(line,.level,.mumpsMode)
- . D log(out,io,src)
- . Q
- U io C src
  W " Q",!
- W " ;"
  Q
  ;
-parseLine(line,level,mumpsMode) ; Convert one line of template input.
- ; Arguments
- ; ---------
- ;  line          Input line to be converted.
- ;  .level        Current level of indentation.  Default = 0
+processLine(line,mumpsMode,lev) ;
+ N fc,lc
+ S fc=$$findNonWs(line),lc=$$findNonWs(line,-1)
  ;
- ; The following variables are needed when $Io '= $Principal (aka when
- ; NOT testing from the command line).
- ; ---------------------------------------------- 
- ;  io            Established output device.
- ;  filename      File device containing template.
+ I mumpsMode D  Q
+ . I $E(line,lc-1,lc)="%>" S mumpsMode=0 Q
+ . W line,!
+ . Q
  ;
- N debug,left,name,out,rest,right
+ I $E(line,fc,fc+1)="<%",$E(line,lc-1,lc)="%>" D  Q  ; Single-line MUMPS
+ . S line=$$trim^%str($E(line,fc+2,$L(line)-2))
+ . I line="end" W $$lev(lev)_"Q",! S lev=lev-1 Q
+ . W $$lev(lev)_line,!
+ . S:" D DO "[$$uc^%str($P(line," ",$L(line," "))) lev=lev+1
+ . Q
  ;
- S debug=0,out=""
- S:($G(level)<0)!($G(level)="") level=0
+ I $E(line,fc,fc+1)="<%" S mumpsMode=1 Q
  ;
- ; Use sensible defaults for the common scenario of command-line testing.
- I $P=$I N io,filename S (io,filename)=$P
- ;
- I line["${" D  Q $$lev(level)_out
- . F i=1:1:$L(line,"${") D
- . . S part=$P(line,"${",i)
- . . ;
- . . I i=1 S out=out_$$escape(part) Q  ; This will never have a variable.
- . . D:debug log("1: "_part_"~"_out,io,filename)
- . . ;
- . . ; Extract variable name.
- . . S left=1,right=$F(part,"}",left)-2
- . . S name=$$trim^%str($E(part,left,right))
- . . S rest=$E(part,right+2,$L(part))
- . . ;
- . . ; Global variable.
- . . I $E(name,1)="^" S out=out_"_$G("_name_",""??"")_"_$$escape(rest) Q
- . . ;
- . . ; Function call.
- . . I $E(name,1,2)="$$" S out=out_"_"_name_"_"_$$escape(rest) Q
- . . ;
- . . ; Fall back if variable name isn't valid.
- . . I name'?.A.N S out=out_$$escape(part) Q
- . . D:debug log("2: "_name_"~"_part_"~"_out,io,filename)
- . . ;
- . . S out=out_"_$G("_name_",""??"")"_"_"_$$escape(rest)
- . . D:debug log("3: "_name_"~"_rest_"~"_out,io,filename)
+ I line["<%" D  Q  ; Contains expression within text.
+ . N left,right,out
+ . S left=1,out=""
+ . S right=0 F  S right=$F(line,"<%",left) Q:right=0  D
+ . . S out=out_$$repr^%str($E(line,left,right-3))_"_"
+ . . S left=right,right=$F(line,"%>",left)
+ . . S out=out_$$trim^%str($E(line,left,$S(right=0:$L(line),1:right-3)))_"_"
+ . . S left=right
  . . Q
- . S out="D send^%web("_out_")"
+ . S out=out_$$repr^%str($E(line,left,$L(line)))
+ . I $E(out,$L(out))="_" S out=$E(out,1,$L(out)-1)
+ . W $$lev(lev)_"D send^%web("_out_")",!
  . Q
  ;
- I $$wsSw(line,"%end"),mumpsMode=1 S mumpsMode=0 Q $$lev(level)_";"
- I $$wsSw(line,"%end") S out=$$lev(level)_"Q",level=level-1  Q out
+ W $$lev(lev)_"D send^%web("_$$repr^%str(line)_")",!
  ;
- I mumpsMode=1 Q line
- ;
- I $$wsSw(line,"%mumps") S mumpsMode=1 Q $$lev(level)_";"
- ;
- I $$wsSw(line,"%") D  Q out
- . S out=$$lev(level)_$$trim^%str($E(line,2,$L(line)))
- . I $$wsEw(line," D") S level=level+1 Q
- . I $$wsEw(line," DO") S level=level+1 Q
- . I $$wsEw(line," Do") S level=level+1 Q
- . I $$wsEw(line," do") S level=level+1 Q
- . Q
- ;
- S out=$$lev(level)_"D send^%web("_$$escape(line)_")"
- ;
- Q out
+ Q
  ;

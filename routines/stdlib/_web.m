@@ -63,7 +63,7 @@
  ;
  D parseData
  ;
- I $T(@("onHeader"_code))'="" D @("onHeader"_code)
+ I $T(@("beforeHeader"_code))'="" D @("beforeHeader"_code)
  ;
  S header="" F  S header=$O(%resp("headers",header)) Q:header=""  D
  . S:$$uc^%str(header)="CONTENT-TYPE" contentTypeSent=1
