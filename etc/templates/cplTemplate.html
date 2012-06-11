@@ -1,0 +1,55 @@
+<%
+ quit
+ ;
+header(section) ;
+ set section=$get(section)
+ set:section'="" section=" :: "_section ;'
+%>
+<!doctype html>
+<html>
+<head>
+<title>Reynard CP<% section %></title>
+<style>
+
+#nav {
+    float: left;
+    font-family: Lucida Grande, Lucida Sans Unicode;
+    font-size: 13px;
+}
+
+#nav td {
+    background-color: #EFEFEF;
+    margin: 3px;
+    padding: 5px;
+    width: 150px;
+}
+
+#nav td.spacer {
+    background-color: #FFFFFF;
+    padding: 0;
+    width: 4px;
+}
+
+#nav td.lit {
+    background-color: #8B0000;
+}
+
+</style>
+</head>
+<body>
+    
+<table id="nav">
+    <tr><td class="spacer"></td><td><a href="#">Configuration</a></td>
+    <tr><td class="spacer"></td><td><a href="#">Globals</a></td>
+    <tr><td class="spacer lit"></td><td><a href="#">Routines</a></td>
+    <tr><td class="spacer"></td><td><a href="#">Web Routes</a></td>
+</table>
+
+<div id="content">
+<%
+ quit
+footer ;
+%>
+</div>
+</html>
+<% quit %>

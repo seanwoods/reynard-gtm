@@ -20,7 +20,7 @@ translate(inFile,outDir) ; Translate a template.
  N outFile
  S:$E(outDir,$L(outDir))'="/" outDir=outDir_"/"
  S outFile=outDir_$ZPARSE(inFile,"NAME")_".m"
- O outFile:NEWVERSION
+ O outFile:NEWVERSION U outFile
  D processFile(inFile)
  C outFile
  Q

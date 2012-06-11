@@ -223,3 +223,14 @@ slug(str) ; Transform a string into a URL-friendly "slug"
  ;
  Q slug
  ;
+replace(str,search,replace) ;
+ N left,right,out
+ S left=1,out=""
+ Q:str'[search str
+ S right=0 F  S right=$F(str,search,left) Q:right<1  D
+ . S out=out_$E(str,left,right-$L(search)-1)_replace
+ . S left=right
+ . Q
+ S out=out_$E(str,left,$L(str))
+ Q out
+ ;
