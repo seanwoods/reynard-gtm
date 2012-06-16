@@ -1,0 +1,3 @@
+#!/bin/bash
+
+$gtm_dist/mumps -r translateAll^%tpl

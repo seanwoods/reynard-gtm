@@ -13,7 +13,7 @@ dbserver:
 
 gtm_fastcgi:
 	gcc src/gtm_fastcgi.c \
-		-o bin/gtm_fastcgi \
+		-o bin/_fastcgi \
 		$(GTMFLAGS) \
 		-lfcgi \
         -rdynamic \

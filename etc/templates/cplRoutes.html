@@ -1,5 +1,4 @@
 <%
- new (%req,%resp)
  goto body
 txt(id,value) ;
  quit "<input type=""text"" id="""_id_""" value="""_value_"""/>"
@@ -15,10 +14,7 @@ body ;
   <th>Entry Point</th>
 </tr>
 <% set row=0,sub=$na(^sWebRoute) for  set sub=$q(@sub) quit:sub=""  do %>
-<%
- . set rte="",row=row+1
- . for i=1:1:$ql(sub) set rte=rte_"/"_$qs(sub,i)
-%>
+<% set rte="",row=row+1 for i=1:1:$ql(sub) set rte=rte_"/"_$qs(sub,i) %>
 <tr>
   <td><% $$txt("route-"_row,rte) %></td>
   <td><% $$txt("endpoint-"_row,$p(@sub,"|",2)) %></td>

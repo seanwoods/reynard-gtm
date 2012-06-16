@@ -1,17 +1,46 @@
 #!/usr/bin/env bash
 
-#if [ "$0" -ne "-bash" ]; then
-#    echo "Error: Use source on this script, don't execute it directly."
-#    return
-#    # TODO what about other shells
-#fi
+ftype=$(stat --printf=%F $(readlink /dev/fd/0))
 
-if [ -z `which icu-config` ]; then
-    echo "Error: icu-config not found!"
-    return
-else
-    icu_version=`icu-config --version`
-fi
+get_icu_version () {
+    # In ICU v4.9, the output of the `icu-config --version` command changed.
+    # This small embedded awk script detects that change and prints the
+    # proper value.
+
+    icu-config --version | awk '
+    
+BEGIN { FS="." }
+
+{
+    if (length($1) == 1) {
+        print $1 "." $2
+    } else {
+        print substr($1, 1, 1) "." substr($1, 2, 1)
+    }
+}'
+
+}
+
+get_gtm_routines () {
+    
+    # 1) find subdirs of $mumps_root/routines
+    # 2) discard directories beginning with "."
+    # 3) dereference any symbolic links
+    # 4) convert from sequence of lines to space-separated sequence
+    # 5) trim leading whitespace
+    # 6) trim trailing whitespace
+    # 7) append GT.M standard routine path
+
+    echo $(\
+    find $mumps_root/routines -type d | \
+    grep -v '/\.' | \
+    xargs -I {} readlink -f {} | \
+    tr '\n' ' ' | \
+    sed -e 's/^[[:space:]]*//' \
+        -e 's/[[:space:]]*$//' \
+    ) $gtm_dist
+
+}
 
 if [ -z "$gtm_dist" ]; then
     echo 'Error: $gtm_dist variable not set.'
@@ -144,6 +173,13 @@ gtmdeactivate () {
     else
         unset LC_ALL
     fi
+    
+    if [ -n "$_old_LD_LIBRARY_PATH" ]; then
+        LD_LIBRARY_PATH=$_old_LD_LIBRARY_PATH
+        export LD_LIBRARY_PATH
+    else
+        unset LD_LIBRARY_PATH
+    fi
 
 }
 
@@ -203,16 +239,20 @@ if [ -n "$LC_ALL" ]; then
     _old_LC_ALL=$LC_ALL
 fi
 
+if [ -n "$LD_LIBRARY_PATH" ]; then
+    _old_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+fi
+
 # Set up Unicode handling, if applicable.
 
 if [ `basename $gtm_dist` = 'utf8' ]; then
-    #export gtm_icu_version=$(echo `icu-config --version` | cut -d '.' -f 1,2)
-    export gtm_icu_version="4.9"
+    export gtm_icu_version=`get_icu_version`
     export gtm_chset=UTF-8
     export LC_CTYPE=en_US.utf8
     export LC_ALL=en_US.utf8
 fi
 
+export LD_LIBRARY_PATH=$gtm_dist:$LD_LIBRARY_PATH
 export gtmver=`$gtm_dist/mumps -r %XCMD 'W $P($ZV," ",2)_"_"_$P($ZV," ",4)'`
 export gtm_retention=42
 export mumps_root=$PWD
@@ -220,7 +260,7 @@ export PATH="$PWD/bin:$PATH"
 export gtm_tmp=$mumps_root/tmp
 export gtm_log=$mumps_root/log
 export gtmgbldir=$mumps_root/globals/gtm.gld
-export gtmroutines="$(find $mumps_root/routines -type d | grep -v '/\.' | xargs -I {} readlink -f {} | tr '\n' ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//') $gtm_dist"
+export gtmroutines=`get_gtm_routines`
 export GTMCI=$mumps_root/etc/citab
 alias mumps='$gtm_dist/mumps'
 alias mupip='$gtm_dist/mupip'

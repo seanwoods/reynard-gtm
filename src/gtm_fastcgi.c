@@ -85,16 +85,24 @@ static int gtm_do(context_t *context, char *routine) {
 FCGX_Request gtm_fcgi_req;
 
 int main (int argc, char *argv[]) {
-
-    context_t context;
-    int socket;
     
+    context_t context;
+    int fcgi_socket;
+    char *socket;
+
     FCGX_Init();
-    socket = FCGX_OpenSocket(":6070", 5);
+    
+    socket = getenv("gtm_fcgi_socket");
+
+    if (socket == NULL) {
+        socket = ":6070";
+    }
+
+    fcgi_socket = FCGX_OpenSocket(socket, 5);
 
     // TODO error check
 
-    FCGX_InitRequest(&gtm_fcgi_req, socket, 0);
+    FCGX_InitRequest(&gtm_fcgi_req, fcgi_socket, 0);
 
     gtm_initialize(&context);
 

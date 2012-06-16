@@ -1,7 +1,7 @@
 *.o
 bin/_dbserver
+bin/_fastcgi
 bin/*.so
-bin/gtm_fastcgi
 globals/*
 routines/queries/*
 routines/templates_c/*

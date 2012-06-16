@@ -38,12 +38,14 @@ header(section) ;
 </head>
 <body>
     
-<table id="nav">
+<div id="nav">
+  <table>
     <tr><td class="spacer"></td><td><a href="#">Configuration</a></td>
     <tr><td class="spacer"></td><td><a href="#">Globals</a></td>
     <tr><td class="spacer lit"></td><td><a href="#">Routines</a></td>
     <tr><td class="spacer"></td><td><a href="#">Web Routes</a></td>
-</table>
+  </table>
+</div>
 
 <div id="content">
 <%
@@ -51,5 +53,9 @@ header(section) ;
 footer ;
 %>
 </div>
+<center>
+<div><small><% $ZV %></small></div>
+<div><small><% $$env^%web("REMOTE_ADDR") %></small></div>
+</center>
 </html>
 <% quit %>
