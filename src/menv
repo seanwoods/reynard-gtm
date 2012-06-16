@@ -1,0 +1,169 @@
+#!/bin/sh
+
+VERSION='master'
+
+WGET=`which wget`
+
+DIST="menv-$VERSION.tar.gz" 
+SRC="https://github.com/seanwoods/menv/tarball/$VERSION"
+TMP="/tmp"
+
+_PWD=$PWD
+
+check_wget () {
+    if [ -z "$WGET" ]; then
+        echo "Error. Valid wget not found, required for this operation."
+        exit 2
+    fi
+}
+
+activate () {
+    if [ -f "$PWD/bin/activate" ]; then
+        source "$PWD/bin/activate"
+    fi
+}
+
+case $1 in
+    init)
+        check_wget
+        cd $TMP && mkdir "menv$$" && cd "menv$$"
+
+        if [ `basename $PWD` != "menv$$" ]; then
+            echo "Error: Problem creating temp directory..."
+            cd $_PWD
+            exit 2
+        fi
+
+        wget $SRC -O - | tar -xzv
+
+        if [ $? -ne 0 ]; then
+            echo "Error: Problem with wget or tar operation PID $?..."
+            cd $_PWD
+            exit 2
+        fi
+        
+        if [ `ls | wc -l` -gt 1 ]; then
+            echo "Error: Untar resulted in more than one file..."
+            cd $_PWD
+            exit 2
+        else
+            newdir=`ls`
+        fi
+        cd $newdir/skeleton
+        
+        mv * $_PWD && cd $_PWD
+        rm -rf "$TMP/menv$$"
+        touch $_PWD/.menv
+
+        for dir in routines globals log tmp
+        do
+            if [ ! -d $dir ]; then
+                mkdir $dir
+            fi
+        done
+
+    ;;
+    activate)
+        echo "You can't activate the environment via the menv script."
+        echo "Instead, type \`source bin/activate\`."
+        
+        if [ -z "$gtm_dist"]; then
+            echo ""
+            echo "Also, you haven't set \$gtm_dist yet.  You should do that."
+        fi
+
+        exit 2
+    ;;
+    cmd)
+        activate
+        $gtm_dist/mumps -run "%XCMD $@"
+    ;;
+    cmdt)
+        activate
+        time $gtm_dist/mumps -run "%XCMD $@"
+    ;;
+    dbserver)
+        activate
+        $PWD/bin/_dbserver
+    ;;
+    ed)
+        activate
+        aaa="%XCMD ZED \"$2\""
+        #$gtm_dist/mumps -run "%XCMD ZED \"$2\""
+        $gtm_dist/mumps -r $aaa
+    ;;
+    err)
+        activate
+        $gtm_dist/mumps -run "%XCMD D display^%err($2)"
+    ;;
+    expr)
+        activate
+        $gtm_dist/mumps -run %XCMD "W $2"
+    ;;
+    search)
+        find routines -name *.m | xargs grep "$2"
+    ;;
+    g)  # Custom Global Viewer
+        activate
+        $gtm_dist/mumps -run %gs
+    ;;
+    gde)
+        activate
+        
+        # GDE.o only exists in non-UTF8 land.
+        if [ `basename $gtm_dist` = 'utf8' ]; then
+            gtm_dist=`dirname $gtm_dist`
+            gtm_chset="M"
+        fi
+        
+        # We don't need other routines for GDE
+        gtmroutines=$gtm_dist
+
+        echo "Launching GDE.  EXIT = save changes, QUIT = don't save changes."
+
+        $gtm_dist/mumps -run GDE
+    ;;
+    mupip)
+        activate
+        shift
+        $gtm_dist/mupip $@
+    ;;
+    procs)
+        echo "MUMPS Processes:"
+        ps aux | grep mumps | grep -v 'grep' | awk '{print $1, $2}'
+        echo "DBServer Processes:"
+        ps aux | grep _dbserver | grep -v 'grep' | awk '{print $1, $2}'
+        echo "FastCGI Processes:"
+        ps aux | grep _fastcgi | grep -v 'grep' | awk '{print $1, $2}'
+    ;;
+    run)
+        activate
+        $gtm_dist/mumps -run "$2"
+    ;;
+    sh)
+        activate
+        $gtm_dist/mumps -direct
+    ;;
+    t)
+        activate
+        $gtm_dist/mumps -run %XCMD "W \$T($2),!"
+    ;;
+    zw)
+        activate
+        $gtm_dist/mumps -run %XCMD "D query^%gs(\$NA($2))"
+    ;;
+    zwr)
+        activate
+        $gtm_dist/mumps -run %XCMD "ZWR $2"
+    ;;
+    *)
+        activate
+
+        if [ ! -f "$PWD/bin/$1" ]; then
+            echo "menv: Plugin $1 not found."
+            exit 2
+        else
+            "$PWD/bin/$1"
+        fi
+    ;;
+esac
