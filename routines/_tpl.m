@@ -23,13 +23,17 @@ translate(inFile,outDir) ; Translate a template.
  O outFile:NEWVERSION U outFile
  D processFile(inFile)
  C outFile
+ ZL $ZPARSE(inFile,"NAME")
  Q
  ;
 translateAll ;
  N file,pattern
  S pattern=$ZTRNLNM("mumps_root")_"/etc/templates/*"
  S:$G(^sParam("tplc"))="" $EC=",U01-Output directory blank.,"
- F  S file=$ZSEARCH(pattern) Q:file=""  D translate(file,^sParam("tplc"))
+ F  S file=$ZSEARCH(pattern) Q:file=""  D
+ . Q:$E($ZPARSE(file,"NAME"),1)="."
+ . D translate(file,^sParam("tplc"))
+ . Q
  Q
  ;
 processFile(filename) ; Translate template from file to $IO

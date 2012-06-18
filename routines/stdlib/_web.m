@@ -117,6 +117,9 @@ send(data,noNewLine,escape) ; Send data to client.
  S $EC=",U03-Unknown transport type.,"
  Q
  ;
+url(url) ;
+ Q $$env("SCRIPT_NAME")_url
+ ;
 resolveRoute(path) ;
  N i,s,pc,target,var,v
  S s=$NA(^sWebRoute),target=""

@@ -1,0 +1,18 @@
+<% do header^cplTemplate("Configuration") %>
+
+<table>
+  <tr>
+    <th>Debug Mode</th>
+    <% set checked=$s($g(^sParam("debug"))=1:"checked=""checked""",1:"") %>
+    <td><input type="checkbox" <% checked %> name="debug"/></td>
+  </tr>
+  <tr>
+    <th>Save Compiled Templates To</th>
+    <td><input type="text"
+               name="SaveCompiledTemplatesTo"
+               size="45"
+               value="<% $$HTMLout^%cgi($g(^sParam("tplc"))) %>"/></td>
+  </tr>
+</table>
+
+<% do footer^cplTemplate %>

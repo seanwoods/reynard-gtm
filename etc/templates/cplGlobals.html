@@ -1,0 +1,13 @@
+<% do header^cplTemplate("Globals") %>
+<%
+ new roots
+ do roots^%gs(.roots)
+%>
+
+<pre>
+<% set roots="" for  set roots=$order(roots(roots)) quit:roots=""  do %>
+<a href="<% $$url^%web("/system/globals/"_$e(roots,2,$l(roots))) %>"><% roots %></a>
+<% end %>
+</pre>
+
+<% do footer^cplTemplate %>

@@ -1,0 +1,18 @@
+<% do header^cplTemplate("Routines") %>
+
+<%
+ N cmd,io,line,rou
+ S cmd="A",io=$I
+ O cmd:(command=$ZTRNLNM("mumps_root")_"/bin/rouls":readonly)::"PIPE"
+ U cmd
+ F  R line Q:$ZEOF  S rou($TR(line,"_","%"))=1
+ U io C cmd
+%>
+
+<pre>
+<% s rou="" f  s rou=$o(rou(rou)) q:rou=""  d  %>
+<a href="<% $$url^%web("/system/routines/"_$$URLout^%cgi(rou)) %>"><% rou %></a>
+<% end %>
+</pre>
+
+<% do footer^cplTemplate %>

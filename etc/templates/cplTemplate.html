@@ -1,6 +1,10 @@
 <%
  quit
  ;
+lit(url) ;
+ if $$sw^%str($$env^%web("PATH_INFO"),url) quit " lit"
+ quit ""
+ ;
 header(section) ;
  set section=$get(section)
  set:section'="" section=" :: "_section ;'
@@ -10,6 +14,16 @@ header(section) ;
 <head>
 <title>Reynard CP<% section %></title>
 <style>
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#content {
+    float: left;
+    padding-left: 5px;
+}
 
 #nav {
     float: left;
@@ -34,16 +48,32 @@ header(section) ;
     background-color: #8B0000;
 }
 
+#footer {
+    clear: both;
+}
+
 </style>
 </head>
 <body>
     
 <div id="nav">
   <table>
-    <tr><td class="spacer"></td><td><a href="#">Configuration</a></td>
-    <tr><td class="spacer"></td><td><a href="#">Globals</a></td>
-    <tr><td class="spacer lit"></td><td><a href="#">Routines</a></td>
-    <tr><td class="spacer"></td><td><a href="#">Web Routes</a></td>
+    <tr>
+      <td class="spacer<% $$lit("/system/config") %>"></td>
+      <td><a href="<% $$url^%web("/system/config") %>">Configuration</a></td>
+    </tr>
+    <tr>
+      <td class="spacer<% $$lit("/system/globals") %>"></td>
+      <td><a href="<% $$url^%web("/system/globals") %>">Globals</a></td>
+    </tr>
+    <tr>
+      <td class="spacer<% $$lit("/system/routines") %>"></td>
+      <td><a href="<% $$url^%web("/system/routines") %>">Routines</a></td>
+    </tr>
+    <tr>
+      <td class="spacer<% $$lit("/system/routes") %>"></td>
+      <td><a href="<% $$url^%web("/system/routes") %>">Web Routes</a></td>
+    </tr>
   </table>
 </div>
 
@@ -53,7 +83,7 @@ header(section) ;
 footer ;
 %>
 </div>
-<center>
+<center id="footer">
 <div><small><% $ZV %></small></div>
 <div><small><% $$env^%web("REMOTE_ADDR") %></small></div>
 </center>

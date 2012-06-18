@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "fcgi_config.h"
@@ -90,6 +91,8 @@ int main (int argc, char *argv[]) {
     int fcgi_socket;
     char *socket;
 
+    // Initialize FastCGI library and socket.
+
     FCGX_Init();
     
     socket = getenv("gtm_fcgi_socket");
@@ -100,18 +103,23 @@ int main (int argc, char *argv[]) {
 
     fcgi_socket = FCGX_OpenSocket(socket, 5);
 
-    // TODO error check
+        // TODO error check
 
     FCGX_InitRequest(&gtm_fcgi_req, fcgi_socket, 0);
 
+    // Initialize GT.M
+    
     gtm_initialize(&context);
+
+    // Main request loop.
 
     while (FCGX_Accept_r(&gtm_fcgi_req) >= 0) {
         gtm_do(&context, "^%FastCGI");
     }
     
-    FCGX_Finish_r(&gtm_fcgi_req);
+    // Close libraries.
 
+    FCGX_Finish_r(&gtm_fcgi_req);
     gtm_teardown(&context);
 
     return 0;

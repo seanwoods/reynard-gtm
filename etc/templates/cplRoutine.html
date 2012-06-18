@@ -1,0 +1,13 @@
+<% do header^cplTemplate("List Routine") %>
+
+<pre>
+<%
+ new line
+ set line=1 for  quit:$t(@("+"_line_"^"_$$data^%web("routine")))=""  d
+ . do send^%web($t(@("+"_line_"^"_$$data^%web("routine"))),,1)
+ . set line=line+1
+ . quit
+%>
+</pre>
+
+<% do footer^cplTemplate %>

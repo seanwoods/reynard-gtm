@@ -5,9 +5,11 @@
  . I rtn'["$DMOD",rtn'["$CI",rtn'=$T(+0),rtn'="%api" ZL $TR(rtn,"%","_")
  . Q
  ;
- K %req,%resp
+ K  ; Remove any existing process state.
+ S $EC=""
  ;
  S %req("transport")="FastCGI"
+ D:$G(^sParam("debug"))=1 translateAll^%tpl
  D ^%web
  ;
  Q

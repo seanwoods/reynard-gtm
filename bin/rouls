@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for dir in $gtmroutines
+do
+    for file in $(find $dir -name '*.m')
+    do
+        echo `basename $file`
+    done
+done
