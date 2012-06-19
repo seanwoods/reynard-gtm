@@ -243,7 +243,6 @@ qreplace(str,search,replace) ; Quotation-aware replace function.
  . I inQuote S out=out_char S:char="""" inQuote=0 Q
  . I char="""" S out=out_char,inQuote=1 Q
  . I char'=$E(search,1) S out=out_char Q
- . W $E(str,i,i+$L(search)-1)=search,!
  . I $E(str,i,i+$L(search)-1)=search S out=out_replace,i=i+$L(search)-1
  . Q
  Q out
