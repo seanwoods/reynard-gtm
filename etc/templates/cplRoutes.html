@@ -11,12 +11,14 @@ body ;
 <% do header^cplTemplate("Routes") %>
 <table>
 <tr>
+  <th>&nbsp;</th>
   <th>Pattern</th>
   <th>Entry Point</th>
 </tr>
 <% set row=0,sub=$na(^sWebRoute) for  set sub=$q(@sub) quit:sub=""  do %>
 <% set rte="",row=row+1 for i=1:1:$ql(sub) set rte=rte_"/"_$qs(sub,i) %>
 <tr>
+  <td><input type="checkbox" name="cb"/></td>
   <td><% $$txt("route-"_row,rte,40) %></td>
   <td><% $$txt("endpoint-"_row,$p(@sub,"|",2)) %></td>
 </tr>

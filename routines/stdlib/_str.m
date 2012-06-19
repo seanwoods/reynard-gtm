@@ -234,3 +234,17 @@ replace(str,search,replace) ;
  S out=out_$E(str,left,$L(str))
  Q out
  ;
+qreplace(str,search,replace) ; Quotation-aware replace function.
+ ;; Don't replace within quoted strings.
+ N char,i,inQuote,len,out
+ S inQuote=0,len=$L(str),out=""
+ F i=1:1:len D
+ . S char=$E(str,i)
+ . I inQuote S out=out_char S:char="""" inQuote=0 Q
+ . I char="""" S out=out_char,inQuote=1 Q
+ . I char'=$E(search,1) S out=out_char Q
+ . W $E(str,i,i+$L(search)-1)=search,!
+ . I $E(str,i,i+$L(search)-1)=search S out=out_replace,i=i+$L(search)-1
+ . Q
+ Q out
+ ;

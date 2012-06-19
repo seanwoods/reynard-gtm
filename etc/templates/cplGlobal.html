@@ -5,7 +5,7 @@
 <% set g="^"_$$data^%web("global"),root=$qs(g,0) %>
 <% for  set g=$query(@g) quit:g=""  do %>
 <%
- . set cols=80
+ . set cols=$g(^sParam("glcols"),80)
  . set val=$$repr^%str(@g)
  . if $l(g)+$l(val)+3<(cols+1) d send^%web(g_" = "_$$HTMLout^%cgi(val)) q
  . ; otherwise, we need to break up the value
