@@ -1,0 +1,54 @@
+<%
+ goto body
+ ;
+onPOST ;
+ N endpt,num,path,glvn,delete
+ S endpt="endpoint"
+ TS
+ F  S endpt=$O(%req("data",endpt)) Q:~$$sw^%str(endpt,"endpoint")  D
+ . S num=$P(endpt,"-",2)
+ . S path=$$data^%web("route-"_num)
+ . Q:path=""  ; Ignore blank paths
+ . S glvn=$$routeGlvn^%web(path)
+ . S delete=~($$data^%web("cb-"_num)="")
+ . I delete K @glvn Q
+ . ; TODO - validate endpoint
+ . D addRoute^%web(path,$$data^%web(endpt))
+ . Q
+ TC
+ S %resp("headers","Location")=$$url^%web("/system/routes")
+ Q
+ ;
+txt(id,value,size) ;
+ if $get(size)="" set size=25
+ quit "<input type=""text"" id="""_id_""" name="""_id_""" value="""_value_""" size="""_size_"""/>"
+ ;
+body ;
+ new row,rte,sub,i
+ set rte=""
+%>
+<% do header^cplTemplateT("Routes") %>
+<form action="<% $$url^%web("/system/routes") %>" method="POST">
+<table>
+<tr>
+  <th>&nbsp;</th>
+  <th>Pattern</th>
+  <th>Entry Point</th>
+</tr>
+<% set row=0,sub=$na(^sWebRoute) for  set sub=$q(@sub) quit:sub=""  do %>
+<% set rte="",row=row+1 for i=1:1:$ql(sub) set rte=rte_"/"_$qs(sub,i) %>
+<tr>
+  <td><input type="checkbox" name="cb-<% row %>"/></td>
+  <td><% $$txt("route-"_row,rte,40) %></td>
+  <td><% $$txt("endpoint-"_row,$p(@sub,"|",2)) %></td>
+</tr>
+<% end %>
+<tr>
+  <td><input type="checkbox" name="cb-<% (row+1) %>"/></td>
+  <td><% $$txt("route-"_(row+1),"",40) %></td>
+  <td><% $$txt("endpoint-"_(row+1),"") %></td>
+</tr>
+</table>
+<input type="submit" name="submit"/>
+</form>
+<% do footer^cplTemplateT %>

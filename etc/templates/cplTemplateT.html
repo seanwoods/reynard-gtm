@@ -5,14 +5,21 @@ lit(url) ;
  if $$sw^%str($$env^%web("PATH_INFO"),url) quit " lit"
  quit ""
  ;
+menuItem(endpoint,caption) ;
+%>
+<tr>
+  <td class="spacer<% $$lit(endpoint) %>"></td>
+  <td><a href="<% $$url^%web(endpoint) %>"><% caption %></a></td>
+</tr>
+<%
+ quit
+ ;
 header(section) ;
- set section=$get(section)
- set:section'="" section=" :: "_section ;'
 %>
 <!doctype html>
 <html>
 <head>
-<title>Reynard CP<% section %></title>
+<title>Reynard CP<% $S($G(section)="":"",1:" :: "_section) %></title>
 <style>
 
 body {
@@ -58,22 +65,12 @@ body {
     
 <div id="nav">
   <table>
-    <tr>
-      <td class="spacer<% $$lit("/system/config") %>"></td>
-      <td><a href="<% $$url^%web("/system/config") %>">Configuration</a></td>
-    </tr>
-    <tr>
-      <td class="spacer<% $$lit("/system/globals") %>"></td>
-      <td><a href="<% $$url^%web("/system/globals") %>">Globals</a></td>
-    </tr>
-    <tr>
-      <td class="spacer<% $$lit("/system/routines") %>"></td>
-      <td><a href="<% $$url^%web("/system/routines") %>">Routines</a></td>
-    </tr>
-    <tr>
-      <td class="spacer<% $$lit("/system/routes") %>"></td>
-      <td><a href="<% $$url^%web("/system/routes") %>">Web Routes</a></td>
-    </tr>
+<%
+ do menuItem("/system/config","Configuration")
+ do menuItem("/system/globals","Globals")
+ do menuItem("/system/routines","Routines")
+ do menuItem("/system/routes","Routes")
+%>
   </table>
 </div>
 

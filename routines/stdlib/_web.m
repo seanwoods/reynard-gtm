@@ -63,24 +63,34 @@
  ;
  D parseData
  ;
- I $T(@("beforeHeader"_code))'="" D @("beforeHeader"_code)
- ;
- S header="" F  S header=$O(%resp("headers",header)) Q:header=""  D
- . S:$$uc^%str(header)="CONTENT-TYPE" contentTypeSent=1
- . D send(header_": "_%resp("headers",header))
- . Q
- ;
- D:$G(contentTypeSent)'=1 send("Content-type: text/html")
- D send("")
- ;
  I $T(@code)="" D  Q
+ . D send("Status: 404 Not Found")
+ . D send("Content-type: text/html")
+ . D send("")
  . D send("<!doctype html>")
+ . I '$G(^sParam("debug")) D send("<h1>Object Not Found") Q
  . D send("<h1>Routine "_code_" Not Found</h1>")
  . D showEnvironment
  . Q
  ;
  S tag="on"_$$env("REQUEST_METHOD")
- I $$hasTag^%rou(code,tag) D @(tag_code) Q
+ I $$hasTag^%rou(code,tag) D  Q
+ . D @(tag_code)
+ . ;
+ . D:'$G(%resp("dirty"))
+ . . S header="" F  S header=$O(%resp("headers",header)) Q:header=""  D
+ . . . S:$$uc^%str(header)="CONTENT-TYPE" contentTypeSent=1
+ . . . D send(header_": "_%resp("headers",header))
+ . . . Q
+ . . Q
+ . ;
+ . D:$G(contentTypeSent)'=1 send("Content-type: text/html")
+ . D send("")
+ . ;
+ . Q
+ ;
+ D send("Content-type: text/html")
+ D send("")
  ;
  D @code
  ;
@@ -121,6 +131,12 @@ url(url) ;
  Q $$env("SCRIPT_NAME")_url
  ;
 resolveRoute(path) ;
+ N glvn
+ S glvn=$$routeGlvn(path)
+ I glvn="" Q ""
+ Q $P(@glvn,"|",2)
+ ;
+routeGlvn(path) ;
  N i,s,pc,target,var,v
  S s=$NA(^sWebRoute),target=""
  F i=1:1:$L(path,"/") D
@@ -128,15 +144,15 @@ resolveRoute(path) ;
  . Q:pc=""
  . S s=$NA(@s@(pc))
  . Q:$D(@s)=0  ; Not worth looking down the whole tree.
- . I i=$L(path,"/") S target=$P(@s,"|",2) Q  ; Match
+ . I i'<$L(path,"/") S target=s Q  ; Match
  . D:$P($G(@s),"|",1)=2
  . . ; A variable is coming.  Keep progressing down the path until we get
  . . ; to the end, or until we get to a non-variable piece.
- . . F  D  Q:(i>$L(path,"/"))!($P($G(@s),"|",1)'=2)
+ . . F  D  Q:(i>$L(path,"/"))!($QS(s,$QL(s))="")  Q:($P($G(@s),"|",1)'=2)
  . . . S var=$O(@s@("")),v=$E(var,2,$L(var))
  . . . S %req("data",v,$I(%req("data",v)))=$P(path,"/",i+1)
  . . . S i=i+1,pc=$P(path,"/",i),s=$NA(@s@(var))
- . . . I i=$L(path,"/") S target=$P($G(@s),"|",2)
+ . . . I i=$L(path,"/") S target=s ; Match
  . . . Q
  . . Q
  . Q

@@ -54,13 +54,13 @@ processLine(line,mumpsMode,lev) ;
  ;
  I mumpsMode D  Q
  . I $E(line,lc-1,lc)="%>" S mumpsMode=0 Q
- . W line,!
+ . W $$qreplace^%str(line,"~","'"),!
  . Q
  ;
  I $E(line,fc,fc+1)="<%",$E(line,lc-1,lc)="%>" D  Q  ; Single-line MUMPS
  . S line=$$trim^%str($E(line,fc+2,$L(line)-2))
  . I line="end" W $$lev(lev)_"Q",! S lev=lev-1 Q
- . W $$lev(lev)_line,!
+ . W $$lev(lev)_$$qreplace^%str(line,"~","'"),!
  . S:" D DO "[$$uc^%str($P(line," ",$L(line," "))) lev=lev+1
  . Q
  ;
@@ -77,7 +77,7 @@ processLine(line,mumpsMode,lev) ;
  . . Q
  . S out=out_$$repr^%str($E(line,left,$L(line)))
  . I $E(out,$L(out))="_" S out=$E(out,1,$L(out)-1)
- . W $$lev(lev)_"D send^%web("_out_")",!
+ . W $$lev(lev)_"D send^%web("_$$qreplace^%str(out,"~","'")_")",!
  . Q
  ;
  W $$lev(lev)_"D send^%web("_$$repr^%str(line)_")",!

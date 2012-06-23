@@ -1,8 +1,11 @@
 %FastCGI ; FastCGI to GT.M Web Bridge
  S $ZT="G ^%err"
- N rtn
- S rtn="" F  S rtn=$V("RTNNEXT",rtn) Q:rtn=""  D
- . I rtn'["$DMOD",rtn'["$CI",rtn'=$T(+0),rtn'="%api" ZL $TR(rtn,"%","_")
+ D:$G(^sParam("debug"))
+ . N rtn
+ . S rtn="" F  S rtn=$V("RTNNEXT",rtn) Q:rtn=""  D
+ . . I rtn'["$DMOD",rtn'["$CI",rtn'=$T(+0),rtn'="%api" ZL $TR(rtn,"%","_")
+ . . Q
+ . ;
  . Q
  ;
  K  ; Remove any existing process state.
