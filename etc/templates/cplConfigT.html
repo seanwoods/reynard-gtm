@@ -1,4 +1,20 @@
+<%
+ goto body
+ ;
+onPOST ;
+ TS
+ I $$data^%web("debug")="on" S ^sParam("debug")=1
+ E  S ^sParam("debug")=0
+ S ^sParam("tplc")=$$data^%web("SaveCompiledTemplatesTo")
+ TC
+ D setHeader^%web("Location",$$url^%web("/system/config"))
+ Q
+ ;
+body
+%>
 <% do header^cplTemplateT("Configuration") %>
+
+<form action="<% $$url^%web("/system/config") %>" method="post">
 
 <table>
   <tr>
@@ -13,6 +29,11 @@
                size="45"
                value="<% $$HTMLout^%cgi($g(^sParam("tplc"))) %>"/></td>
   </tr>
+  <tr>
+    <td colspan="2"><input type="submit" value="Save"/></td>
+  </tr>
 </table>
+
+</form>
 
 <% do footer^cplTemplaterT %>

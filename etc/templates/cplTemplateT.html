@@ -23,6 +23,7 @@ header(section) ;
 <style>
 
 body {
+    font-family: Lucida Grande, Lucida Sans Unicode;
     margin: 0;
     padding: 0;
 }
@@ -55,6 +56,11 @@ body {
     background-color: #8B0000;
 }
 
+#content th,
+#content td {
+    font-size: 13px;
+}
+
 #footer {
     clear: both;
 }
@@ -66,10 +72,11 @@ body {
 <div id="nav">
   <table>
 <%
- do menuItem("/system/config","Configuration")
- do menuItem("/system/globals","Globals")
- do menuItem("/system/routines","Routines")
- do menuItem("/system/routes","Routes")
+ new rte
+ set rte="" for  set rte=$o(^sRouteData(rte)) quit:rte=""  do
+ . quit:~$get(^sRouteData(rte,"left"))
+ . do menuItem(rte,^sRouteData(rte,"caption"))
+ . quit
 %>
   </table>
 </div>

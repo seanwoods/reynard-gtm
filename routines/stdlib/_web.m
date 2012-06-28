@@ -85,11 +85,15 @@
  . . Q
  . ;
  . D:$G(contentTypeSent)'=1 send("Content-type: text/html")
+ . S %req("session")=$$sessionSniff()
+ . D send("Set-Cookie: SID="_$P(%req("session"),"|",2))
  . D send("")
  . ;
  . Q
  ;
  D send("Content-type: text/html")
+ S %req("session")=$$sessionSniff()
+ D send("Set-Cookie: SID="_$P(%req("session"),"|",2))
  D send("")
  ;
  D @code
@@ -297,4 +301,35 @@ processData(data) ; Parse an argument string and populate `%req`.
  . Q
  ;
  Q
+ ;
+token(session) ; Create a unique token.
+ N done,x,tok
+ S x="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+ S done=0
+ F  Q:done  D
+ . S tok=""
+ . F i=1:1:32 S tok=tok_$E(x,($R(9054)*$R(402)#62))
+ . S:$D(^sToken(tok))=0 done=1
+ . Q
+ S ^sToken(tok,$G(session,0))=1
+ Q tok
+ ;
+sessionNew() ; Create a new session.
+ N tok,id
+ S id=$I(^sSession) ; Where we store session data.
+ S tok=$$token(id)
+ S ^sSession(id)=tok
+ S ^sSession(id,"%sig")=$$env("REMOTE_ADDR")_"|"_$$env("HTTP_USER_AGENT")
+ Q id_"|"_tok
+ ;
+sessionSniff() ; Look for a session ID and create a new one if not found.
+ N c,i,tok
+ S c=$$env("HTTP_COOKIE")
+ F i=1:1:$L(c,";") D
+ . Q:$P($P(c,";",i),"=",1)'="SID"
+ . S tok=$P($P(c,";",i),"=",2)
+ . S id=$O(^sToken(tok,""))
+ . Q
+ Q:$G(id)="" $$sessionNew()
+ Q id_"|"_tok
  ;

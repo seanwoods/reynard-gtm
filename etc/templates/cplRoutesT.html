@@ -14,6 +14,8 @@ onPOST ;
  . I delete K @glvn Q
  . ; TODO - validate endpoint
  . D addRoute^%web(path,$$data^%web(endpt))
+ . S ^sRouteData(path,"left")=$S($$data^%web("left-"_num)="on":1,1:0)
+ . S ^sRouteData(path,"caption")=$$data^%web("caption-"_num)
  . Q
  TC
  S %resp("headers","Location")=$$url^%web("/system/routes")
@@ -31,22 +33,29 @@ body ;
 <form action="<% $$url^%web("/system/routes") %>" method="POST">
 <table>
 <tr>
-  <th>&nbsp;</th>
+  <th>Delete</th>
+  <th>Show on<br/>Left</th>
   <th>Pattern</th>
   <th>Entry Point</th>
+  <th>Caption</th>
 </tr>
 <% set row=0,sub=$na(^sWebRoute) for  set sub=$q(@sub) quit:sub=""  do %>
 <% set rte="",row=row+1 for i=1:1:$ql(sub) set rte=rte_"/"_$qs(sub,i) %>
 <tr>
-  <td><input type="checkbox" name="cb-<% row %>"/></td>
+  <td align="center"><input type="checkbox" name="cb-<% row %>"/></td>
+  <% set checked=$S(^sRouteData(rte,"left")=1:"checked=""checked""",1:"") %>
+  <td align="center"><input type="checkbox" name="left-<% row %>" <% checked %>/></td>
   <td><% $$txt("route-"_row,rte,40) %></td>
   <td><% $$txt("endpoint-"_row,$p(@sub,"|",2)) %></td>
+  <td><% $$txt("caption-"_row,$G(^sRouteData(rte,"caption"))) %></td>
 </tr>
 <% end %>
 <tr>
-  <td><input type="checkbox" name="cb-<% (row+1) %>"/></td>
+  <td align="center"><input type="checkbox" name="cb-<% (row+1) %>"/></td>
+  <td align="center"><input type="checkbox" name="left-<% (row+1) %>"/></td>
   <td><% $$txt("route-"_(row+1),"",40) %></td>
   <td><% $$txt("endpoint-"_(row+1),"") %></td>
+  <td><% $$txt("caption-"_(row+1),"") %></td>
 </tr>
 </table>
 <input type="submit" name="submit"/>
