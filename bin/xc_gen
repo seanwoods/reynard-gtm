@@ -1,0 +1,10 @@
+#!/bin/bash
+
+for file in `ls $mumps_root/src/*.c`
+do
+    if [ $(grep '@gtmxc' < $file | wc -l) -gt 0 ]; then
+    
+        modname=`awk '/^\/\*\s*@gtmxc-module/ { print $3 }' < $file`
+        $mumps_root/bin/xc_gen.awk < $file > $mumps_root/etc/$modname.xc
+    fi
+done

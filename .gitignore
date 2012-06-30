@@ -1,4 +1,5 @@
 *.o
+bin/dbserver
 bin/_dbserver
 bin/_fastcgi
 bin/*.so

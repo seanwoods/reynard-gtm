@@ -1,8 +1,10 @@
 #!/bin/bash
 
+# TODO There are lots of duplicates in the output.
+
 for dir in $gtmroutines
 do
-    for file in $(find $dir -name '*.m')
+    for file in $(ls $dir/*.m)
     do
         echo `basename $file`
     done
