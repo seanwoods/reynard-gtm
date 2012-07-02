@@ -1,8 +1,9 @@
 *.o
 bin/dbserver
-bin/_dbserver
-bin/_fastcgi
+bin/fastcgi
 bin/*.so
+etc/citab
+etc/*.xc
 globals/*
 routines/queries/*
 routines/templates_c/*

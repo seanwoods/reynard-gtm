@@ -1,4 +1,0 @@
-#!/bin/bash
-
-export GTMXC_fastcgi=$mumps_root/etc/fastcgi.xc
-$mumps_root/bin/_fastcgi
