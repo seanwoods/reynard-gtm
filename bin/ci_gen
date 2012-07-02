@@ -1,0 +1,21 @@
+#!/bin/bash
+
+function generate () {
+    for dir in $gtmroutines
+    do
+        for file in `ls $dir/*.m`
+        do
+            grep '^ ; @ci' < $file | awk '
+                {
+                    for (i = 3; i <= NF; i++) {
+                        printf "%s ", $i
+
+                        if (i == NF) printf "\n"
+                    }
+                }
+            '
+        done
+    done
+}
+
+generate > $mumps_root/etc/citab

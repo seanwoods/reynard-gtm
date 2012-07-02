@@ -262,6 +262,14 @@ export gtm_log=$mumps_root/log
 export gtmgbldir=$mumps_root/globals/gtm.gld
 export gtmroutines=`get_gtm_routines`
 export GTMCI=$mumps_root/etc/citab
+
+for xc in `ls $mumps_root/etc/*.xc`
+do
+    xc_base=`basename $xc`
+    var="GTMXC_${xc_base%.*}"
+    eval "export $var=$xc"
+done
+
 alias mumps='$gtm_dist/mumps'
 alias mupip='$gtm_dist/mupip'
 alias gtm='$gtm_dist/mumps -direct'

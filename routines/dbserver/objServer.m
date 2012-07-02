@@ -3,13 +3,16 @@ objServer ; handler for external program calls to object server.
  ;
 multiPartCharSeq() Q $C(2,6,3,7)
  ;
+ ; @ci alloc: gtm_char_t* alloc^objServer()
 alloc() ; allocate a new message.
  Q $I(^objServerMsg)
  ;
+ ; @ci exec: gtm_char_t* exec^objServer(I:gtm_char_t*, I:gtm_char_t*)
 setrec(msg,segment,record,data) ;
  S ^objServerMsg(msg,segment,record)=data
  Q 1
  ;
+ ; @ci handleMsg: gtm_char_t* handleMsg^objServer(I:gtm_int_t)
 handleMsg(msgID) ; handle the given message
  N code,done,len,seg,%zzzt
  K out
@@ -46,6 +49,7 @@ handleMsg(msgID) ; handle the given message
  Q:$$hasChildren^%var($NA(out)) $$multiPartCharSeq()_$NA(out)
  Q out
  ;
+ ; @ci next: gtm_char_t* next^objServer(I:gtm_char_t*, IO:gtm_char_t*)
 next(vn,sub) ; retrieve next value from database, incrementing `sub`.
  ;
  ; useful for one-dimensional arrays, e.g. sending multi-part output.

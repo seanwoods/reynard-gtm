@@ -15,10 +15,12 @@
  S $ZT=T
  Q
  ;
+ ; @ci esave: gtm_char_t* ci^%err()
 ci() ; Save error from call-in
  D ^%err
  Q err
  ;
+ ; @ci err: gtm_char_t* err^%err()
 err() Q err
  ;
 bail ; Process error and stop processing.

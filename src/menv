@@ -82,10 +82,6 @@ case $1 in
         activate
         time $gtm_dist/mumps -run "%XCMD $@"
     ;;
-    dbserver)
-        activate
-        $PWD/bin/_dbserver
-    ;;
     ed)
         activate
         aaa="%XCMD ZED \"$2\""
@@ -132,9 +128,9 @@ case $1 in
         echo "MUMPS Processes:"
         ps aux | grep mumps | grep -v 'grep' | awk '{print $1, $2}'
         echo "DBServer Processes:"
-        ps aux | grep _dbserver | grep -v 'grep' | awk '{print $1, $2}'
+        ps aux | grep dbserver | grep -v 'grep' | awk '{print $1, $2}'
         echo "FastCGI Processes:"
-        ps aux | grep _fastcgi | grep -v 'grep' | awk '{print $1, $2}'
+        ps aux | grep fastcgi | grep -v 'grep' | awk '{print $1, $2}'
     ;;
     run)
         activate
@@ -167,3 +163,7 @@ case $1 in
         fi
     ;;
 esac
+
+if [ $? != 0 ]; then
+    stty sane
+fi
