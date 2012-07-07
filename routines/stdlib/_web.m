@@ -319,7 +319,9 @@ sessionNew() ; Create a new session.
  S id=$I(^sSession) ; Where we store session data.
  S tok=$$token(id)
  S ^sSession(id)=tok
- S ^sSession(id,"%sig")=$$env("REMOTE_ADDR")_"|"_$$env("HTTP_USER_AGENT")
+ S $P(^sSession(id,"%sig"),"|",1)=$$env("REMOTE_ADDR")
+ S $P(^sSession(id,"%sig"),"|",2)=$$env("HTTP_USER_AGENT")
+ S $P(^sSession(id,"%sig"),"|",3)=$H
  Q id_"|"_tok
  ;
 sessionSniff() ; Look for a session ID and create a new one if not found.
@@ -332,4 +334,58 @@ sessionSniff() ; Look for a session ID and create a new one if not found.
  . Q
  Q:$G(id)="" $$sessionNew()
  Q id_"|"_tok
+ ;
+setupSystem ; Set up admin system.
+ N r
+ S r=$NA(r("/system/config"))
+ S @r@("endpoint")="^cplConfigT"
+ S @r@("caption")="Configuration"
+ S @r@("left")=1
+ ;
+ S r=$NA(r("/system/errors"))
+ S @r@("endpoint")="^cplErrorsT"
+ S @r@("caption")="Errors"
+ S @r@("left")=1
+ ;
+ S r=$NA(r("/system/globals"))
+ S @r@("endpoint")="^cplGlobalsT"
+ S @r@("caption")="Globals"
+ S @r@("left")=1
+ ;
+ S r=$NA(r("/system/globals/:global"))
+ S @r@("endpoint")="^cplGlobalT"
+ S @r@("caption")=""
+ S @r@("left")=0
+ ;
+ S r=$NA(r("/system/routines"))
+ S @r@("endpoint")="^cplRoutinesT"
+ S @r@("caption")="Routines"
+ S @r@("left")=1
+ ;
+ S r=$NA(r("/system/routines/:routine"))
+ S @r@("endpoint")="^cplRoutineT"
+ S @r@("caption")=""
+ S @r@("left")=0
+ ;
+ S r=$NA(r("/system/routes"))
+ S @r@("endpoint")="^cplRoutesT"
+ S @r@("caption")="Routes"
+ S @r@("left")=1
+ ;
+ S r=$NA(r("/system/users"))
+ S @r@("endpoint")="^cplUserAdmin"
+ S @r@("caption")="Users"
+ S @r@("left")=1
+ ;
+ S r=$NA(r("/system/users/:user"))
+ S @r@("endpoint")="^cplUserAdmin"
+ S @r@("caption")=""
+ S @r@("left")=0
+ ;
+ S r="" F  S r=$O(r(r)) Q:r=""  D
+ . M ^sRouteData(r)=r(r)
+ . D addRoute(r,r(r,"endpoint"))
+ . Q
+ ;
+ Q
  ;

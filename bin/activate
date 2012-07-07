@@ -47,24 +47,9 @@ if [ -z "$gtm_dist" ]; then
     return
 fi
 
-# TODO May need to remove test for writable when shared libraries are used.
-
-#if [ ! -w "$gtm_dist" ]; then
-#    echo "Error: $gtm_dist is not writable by this user.  Programs won't compile."
-#    return
-#fi
-
 if [ -z "$gtm_routines" ]; then
     export gtmroutines=$gtm_dist
 fi
-
-# TODO May need to remvoe test for writable when shared libraries are used.
-
-#for dir in $gtm_routines; do
-#    if [ ! -w "$dir"]; then
-#        echo "Error: $dir is not writable by this user.  Programs won't compile."
-#    fi
-#done
 
 for dir in "routines" "globals" "log" "tmp"; do
     if [ ! -d "$PWD/$dir" ]; then
