@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 VERSION='master'
 
@@ -23,44 +23,50 @@ activate () {
     fi
 }
 
+mkdirs () {
+    for dir in routines globals log tmp
+    do
+        if [ ! -d $dir ]; then
+            mkdir $dir
+        fi
+    done
+}
+
 case $1 in
     init)
-        check_wget
-        cd $TMP && mkdir "menv$$" && cd "menv$$"
+        if [ ! -f "$PWD/.menv" ]; then
+            check_wget
+            cd $TMP && mkdir "menv$$" && cd "menv$$"
 
-        if [ `basename $PWD` != "menv$$" ]; then
-            echo "Error: Problem creating temp directory..."
-            cd $_PWD
-            exit 2
-        fi
-
-        wget $SRC -O - | tar -xzv
-
-        if [ $? -ne 0 ]; then
-            echo "Error: Problem with wget or tar operation PID $?..."
-            cd $_PWD
-            exit 2
-        fi
-        
-        if [ `ls | wc -l` -gt 1 ]; then
-            echo "Error: Untar resulted in more than one file..."
-            cd $_PWD
-            exit 2
-        else
-            newdir=`ls`
-        fi
-        cd $newdir/skeleton
-        
-        mv * $_PWD && cd $_PWD
-        rm -rf "$TMP/menv$$"
-        touch $_PWD/.menv
-
-        for dir in routines globals log tmp
-        do
-            if [ ! -d $dir ]; then
-                mkdir $dir
+            if [ `basename $PWD` != "menv$$" ]; then
+                echo "Error: Problem creating temp directory..."
+                cd $_PWD
+                exit 2
             fi
-        done
+
+            wget $SRC -O - | tar -xzv
+
+            if [ $? -ne 0 ]; then
+                echo "Error: Problem with wget or tar operation PID $?..."
+                cd $_PWD
+                exit 2
+            fi
+            
+            if [ `ls | wc -l` -gt 1 ]; then
+                echo "Error: Untar resulted in more than one file..."
+                cd $_PWD
+                exit 2
+            else
+                newdir=`ls`
+            fi
+            cd $newdir/skeleton
+            
+            mv * $_PWD && cd $_PWD
+            rm -rf "$TMP/menv$$"
+            touch $_PWD/.menv
+        fi
+        
+        mkdirs
 
     ;;
     activate)

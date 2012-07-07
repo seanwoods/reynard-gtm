@@ -49,10 +49,10 @@ fi
 
 # TODO May need to remove test for writable when shared libraries are used.
 
-if [ ! -w "$gtm_dist" ]; then
-    echo "Error: $gtm_dist is not writable by this user.  Programs won't compile."
-    return
-fi
+#if [ ! -w "$gtm_dist" ]; then
+#    echo "Error: $gtm_dist is not writable by this user.  Programs won't compile."
+#    return
+#fi
 
 if [ -z "$gtm_routines" ]; then
     export gtmroutines=$gtm_dist
@@ -60,15 +60,13 @@ fi
 
 # TODO May need to remvoe test for writable when shared libraries are used.
 
-for dir in $gtm_routines
-do
-    if [ ! -w "$dir"]; then
-        echo "Error: $dir is not writable by this user.  Programs won't compile."
-    fi
-done
+#for dir in $gtm_routines; do
+#    if [ ! -w "$dir"]; then
+#        echo "Error: $dir is not writable by this user.  Programs won't compile."
+#    fi
+#done
 
-for dir in "routines" "globals" "log" "tmp"
-do
+for dir in "routines" "globals" "log" "tmp"; do
     if [ ! -d "$PWD/$dir" ]; then
         echo "Error: $PWD/$dir does not exist.  Please create it."
         return
@@ -263,12 +261,13 @@ export gtmgbldir=$mumps_root/globals/gtm.gld
 export gtmroutines=`get_gtm_routines`
 export GTMCI=$mumps_root/etc/citab
 
-for xc in `ls $mumps_root/etc/*.xc`
-do
-    xc_base=`basename $xc`
-    var="GTMXC_${xc_base%.*}"
-    eval "export $var=$xc"
-done
+if [ `ls $mumps_root/etc | grep '\.xc$' | wc -l` -gt 0 ]; then
+    for xc in `ls $mumps_root/etc/*.xc`; do
+        xc_base=`basename $xc`
+        var="GTMXC_${xc_base%.*}"
+        eval "export $var=$xc"
+    done
+fi
 
 alias mumps='$gtm_dist/mumps'
 alias mupip='$gtm_dist/mupip'
