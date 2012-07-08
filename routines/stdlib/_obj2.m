@@ -66,6 +66,11 @@ alloc(class) ;
  S phys="^o"_$$canonical(class)
  Q $I(@phys)
  ;
+exists(class,id) ;
+ N phys
+ S phys="^o"_$$canonical(class)
+ Q ''$D(@phys@(id))
+ ;
 escape(v)
  Q $$encode^%str(v,$C(31))
  ;

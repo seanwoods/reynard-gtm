@@ -1,0 +1,74 @@
+<%
+ g body
+ ;
+onPOST ;
+ new f,id,obj
+ set id=$$data^%web("userid")
+ ; TODO - perform action if userid not found
+ for f="username","fullname","password" set obj(f)=$$data^%web(f)
+ do set^%obj2("SysUser",id,.obj)
+ set %resp("headers","Location")=$$url^%web("/system/users")
+ quit
+ ;
+uf(field) ;
+ ;; @expect id
+ q $$getField^%obj2("SysUser",id,field)
+ ;
+body ;
+ do header^cplTemplateT("User Administration")
+ do
+ . if $$data^%web("user")~="" do showOneRecord quit
+ . do showRecords
+ . quit
+ do footer^cplTemplateT
+ quit
+ ;
+showRecords ; List all available records.
+ new id
+%>
+<table>
+<% set id="" for  set id=$o(^oSysUser(id)) quit:id=""  do %>
+  <tr>
+    <td>
+      <a href="<% $$url^%web("/system/users/"_id)%>"><% $$uf("username")%></a>
+    </td>
+    <td><% $$uf("fullname") %></td>
+  </tr>
+<% end %>
+</table>
+
+<%
+ quit
+showOneRecord ; Show one record for editing.
+ new id,user
+ set id=$$data^%web("user")
+ if id="" do  quit
+ .  do send^%web("ID not valid.")
+ . quit
+ ;
+ if ~$$exists^%obj2("SysUser",id) do  quit
+ . do send^%web("There doesn't appear to be a user by that ID.")
+ . quit
+ ;
+ do get^%obj2("SysUser",id,.user)
+%>
+ <form action="<% $$url^%web("/system/users") %>" method="post">
+ <input type="hidden" name="userid" value="<% id %>"/>
+ <table class="usertable">
+   <tr>
+     <th>Username</th>
+     <td><% $$txt^%html("username",user("username"),15) %></td>
+     <th>Full Name</th>
+     <th><% $$txt^%html("fullname",user("fullname"),40) %></td>
+   </tr>
+   <tr>
+     <th>Password</th>
+     <td><% $$pw^%html("password",15)%></td>
+     <th>&nbsp;</th>
+     <td>&nbsp;</td>
+   </tr>
+   <tr>
+     <td colspan="4"><input type="submit" value="Save"/></td>
+   </tr>
+ </table>
+ </form>
