@@ -7,3 +7,4 @@ etc/*.xc
 globals/*
 routines/queries/*
 routines/templates_c/*
+var/log/*

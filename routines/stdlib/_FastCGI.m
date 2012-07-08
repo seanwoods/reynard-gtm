@@ -12,6 +12,9 @@
  S $EC=""
  ;
  S %req("transport")="FastCGI"
+ ;
+ I $G(^sParam("tplc"))="" S $EC=",U01-No directory for compiled templates.,"
+ ;
  D:$G(^sParam("debug"))=1 translateAll^%tpl
  D ^%web
  ;

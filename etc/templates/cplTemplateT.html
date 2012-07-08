@@ -68,10 +68,11 @@ body {
 </style>
 </head>
 <body>
-    
+
 <div id="nav">
   <table>
 <%
+ d send^%web($$env^%web("HTTP_CACHE_CONTROL"))
  new rte
  set rte="" for  set rte=$o(^sRouteData(rte)) quit:rte=""  do
  . quit:~$get(^sRouteData(rte,"left"))

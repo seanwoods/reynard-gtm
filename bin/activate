@@ -51,7 +51,7 @@ if [ -z "$gtm_routines" ]; then
     export gtmroutines=$gtm_dist
 fi
 
-for dir in "routines" "globals" "log" "tmp"; do
+for dir in "routines" "globals" "var/log" "var/run" "var/htdocs" "tmp"; do
     if [ ! -d "$PWD/$dir" ]; then
         echo "Error: $PWD/$dir does not exist.  Please create it."
         return
@@ -241,7 +241,7 @@ export gtm_retention=42
 export mumps_root=$PWD
 export PATH="$PWD/bin:$PATH"
 export gtm_tmp=$mumps_root/tmp
-export gtm_log=$mumps_root/log
+export gtm_log=$mumps_root/var/log
 export gtmgbldir=$mumps_root/globals/gtm.gld
 export gtmroutines=`get_gtm_routines`
 export GTMCI=$mumps_root/etc/citab

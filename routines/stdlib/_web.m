@@ -50,15 +50,18 @@
  ;     * `setHeader^%web` - Set a header value.
  ;     * `send^%web` - Send one line of response.
  ;
- N contentTypeSent,header
+ N code,contentTypeSent,header,uri
  ;
- S code=$$resolveRoute($$env("PATH_INFO"))
- I code="" D  Q
+ S uri=$$env("PATH_INFO")
+ S code=$$resolveRoute(uri)
+ ;
+ I $G(code)="" D  Q
  . D send("Status: 404 Not Found")
  . D send("Content-type: text/html")
  . D send("")
  . D send("<!doctype html>")
  . D send("<h1>Object Not Found</h1>")
+ . D showEnvironment
  . Q
  ;
  D parseData
@@ -132,6 +135,7 @@ send(data,noNewLine,escape) ; Send data to client.
  Q
  ;
 url(url) ;
+ Q:$G(^sParam("prefix"))'="" ^sParam("prefix")_url
  Q $$env("SCRIPT_NAME")_url
  ;
 resolveRoute(path) ;

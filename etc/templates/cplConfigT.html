@@ -6,6 +6,7 @@ onPOST ;
  I $$data^%web("debug")="on" S ^sParam("debug")=1
  E  S ^sParam("debug")=0
  S ^sParam("tplc")=$$data^%web("SaveCompiledTemplatesTo")
+ S ^sParam("prefix")=$$data^%web("Prefix")
  TC
  D setHeader^%web("Location",$$url^%web("/system/config"))
  Q
@@ -28,6 +29,13 @@ body
                name="SaveCompiledTemplatesTo"
                size="45"
                value="<% $$HTMLout^%cgi($g(^sParam("tplc"))) %>"/></td>
+  </tr>
+  <tr>
+    <th>URL Prefix</th>
+    <td><input type="text"
+               name="Prefix"
+               size="45"
+               value="<% $$HTMLout^%cgi($g(^sParam("prefix"))) %>"/></td>
   </tr>
   <tr>
     <td colspan="2"><input type="submit" value="Save"/></td>
