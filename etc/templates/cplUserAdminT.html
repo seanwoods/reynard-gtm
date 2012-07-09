@@ -5,7 +5,12 @@ onPOST ;
  new f,id,obj
  set id=$$data^%web("userid")
  ; TODO - perform action if userid not found
- for f="username","fullname","password" set obj(f)=$$data^%web(f)
+ for f="username","fullname","password" do
+ . new x
+ . ; hash password
+ . if f="password" do &digest.sha1($$data^%web(f),.x) set obj(f)=x quit
+ . set obj(f)=$$data^%web(f)
+ . quit
  do set^%obj2("SysUser",id,.obj)
  set %resp("headers","Location")=$$url^%web("/system/users")
  quit
