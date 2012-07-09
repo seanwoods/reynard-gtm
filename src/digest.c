@@ -7,6 +7,8 @@
 
 /* @gtmxc sha1: void sha1(I:xc_char_t*, O:xc_char_t*[41]) */
 void sha1 (int count, char *val, char *out) {
+    /*  Hat Tip: http://www.codingsteps.com/creating-using-sha1-hashes-c/ */
+    /* See also: http://www.fifi.org/doc/libgcrypt-doc/reference.html */
     int msg_length = strlen(val);
     int hash_length = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
     unsigned char hash[hash_length];
