@@ -14,3 +14,6 @@ pw(name,len) ;
  S x=x_" length="""_len_"""/>"
  Q x
  ;
+jQuery() ;
+ Q $G(^sParam("static"))_$G(^sParam("jQuery"))
+ ;

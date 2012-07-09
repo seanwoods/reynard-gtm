@@ -5,6 +5,7 @@ onPOST ;
  new f,id,obj
  set id=$$data^%web("userid")
  ; TODO - perform action if userid not found
+ set:id="new" id=""
  for f="username","fullname","password" do
  . new x
  . ; hash password
@@ -51,20 +52,24 @@ showOneRecord ; Show one record for editing.
  .  do send^%web("ID not valid.")
  . quit
  ;
- if ~$$exists^%obj2("SysUser",id) do  quit
- . do send^%web("There doesn't appear to be a user by that ID.")
+ do
+ . if id="new" quit
+ . ;
+ . if ~$$exists^%obj2("SysUser",id) do  quit
+ . . do send^%web("There doesn't appear to be a user by that ID.")
+ . . quit
+ . ;
+ . do get^%obj2("SysUser",id,.user)
  . quit
- ;
- do get^%obj2("SysUser",id,.user)
 %>
  <form action="<% $$url^%web("/system/users") %>" method="post">
  <input type="hidden" name="userid" value="<% id %>"/>
  <table class="usertable">
    <tr>
      <th>Username</th>
-     <td><% $$txt^%html("username",user("username"),15) %></td>
+     <td><% $$txt^%html("username",$G(user("username")),15) %></td>
      <th>Full Name</th>
-     <th><% $$txt^%html("fullname",user("fullname"),40) %></td>
+     <th><% $$txt^%html("fullname",$G(user("fullname")),40) %></td>
    </tr>
    <tr>
      <th>Password</th>

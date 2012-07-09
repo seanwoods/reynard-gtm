@@ -2,6 +2,7 @@
  quit
  ;
 lit(url) ;
+ if $length($$env^%web("PATH_INFO"),"/")~=$length(url,"/") quit ""
  if $$sw^%str($$env^%web("PATH_INFO"),url) quit " lit"
  quit ""
  ;

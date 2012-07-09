@@ -7,6 +7,8 @@ onPOST ;
  E  S ^sParam("debug")=0
  S ^sParam("tplc")=$$data^%web("SaveCompiledTemplatesTo")
  S ^sParam("prefix")=$$data^%web("Prefix")
+ S ^sParam("static")=$$data^%web("StaticFiles")
+ S ^sParam("jQuery")=$$data^%web("PathTojQuery")
  TC
  D setHeader^%web("Location",$$url^%web("/system/config"))
  Q
@@ -36,6 +38,20 @@ body
                name="Prefix"
                size="45"
                value="<% $$HTMLout^%cgi($g(^sParam("prefix"))) %>"/></td>
+  </tr>
+  <tr>
+    <th>Static Files Root</th>
+    <td><input type="text"
+               name="StaticFiles"
+               size="45"
+               value="<% $$HTMLout^%cgi($g(^sParam("static"))) %>"/></td>
+  </tr>
+  <tr>
+    <th>Relative Path to jQuery</th>
+    <td><input type="text"
+               name="PathTojQuery"
+               size="45"
+               value="<% $$HTMLout^%cgi($g(^sParam("jQuery"))) %>"/></td>
   </tr>
   <tr>
     <td colspan="2"><input type="submit" value="Save"/></td>
